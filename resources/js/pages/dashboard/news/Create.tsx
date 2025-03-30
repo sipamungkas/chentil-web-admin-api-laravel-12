@@ -156,7 +156,7 @@ export default function Create({ title }: Props) {
                                             onChange={handleImageChange}
                                             error={errors.image}
                                             accept="image/*"
-                                            className="absolute inset-0 cursor-pointer opacity-0"
+                                            className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                                         />
                                     </div>
                                     {errors.image && <p className="text-sm text-red-500">{errors.image}</p>}
