@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\dashboard;
+namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Models\News;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -16,6 +18,7 @@ class NewsController extends Controller
     {
         return Inertia::render('dashboard/news/index', [
             'title' => 'News Management',
+            'news' => News::orderBy('order')->paginate(10),
         ]);
     }
 
@@ -24,7 +27,7 @@ class NewsController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('dashboard/news/create', [
+        return Inertia::render('dashboard/news/Create', [
             'title' => 'Create News',
         ]);
     }
@@ -32,15 +35,25 @@ class NewsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): Response
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'status' => 'required|in:draft,published',
+            'description' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'is_visible' => 'boolean',
+            'order' => 'integer',
         ]);
 
-        // TODO: Implement news creation logic
+        // dd($request->file('image'));
+
+        if ($request->hasFile('image')) {
+            $fileName = time() . '.' . $request->file('image')->extension();
+            $request->file('image')->move(public_path('images'), $fileName);
+            $validated['image'] = "/images/$fileName";
+        }
+
+        News::create($validated);
 
         return redirect()->route('dashboard.news.index')
             ->with('success', 'News created successfully.');
@@ -49,37 +62,49 @@ class NewsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id): Response
+    public function show(News $news): Response
     {
-        return Inertia::render('dashboard/news/show', [
+        return Inertia::render('dashboard/news/Show', [
             'title' => 'View News',
-            'news' => [], // TODO: Implement news retrieval logic
+            'news' => $news,
         ]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id): Response
+    public function edit(News $news): Response
     {
-        return Inertia::render('dashboard/news/edit', [
+        return Inertia::render('dashboard/news/Edit', [
             'title' => 'Edit News',
-            'news' => [], // TODO: Implement news retrieval logic
+            'news' => $news,
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id): Response
+    public function update(Request $request, News $news)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'status' => 'required|in:draft,published',
+            'description' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'is_visible' => 'boolean',
+            'order' => 'integer',
         ]);
 
-        // TODO: Implement news update logic
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($news->image) {
+                unlink(public_path('') . $news->image);
+            }
+            $fileName = time() . '.' . $request->file('image')->extension();
+            $request->file('image')->move(public_path('images'), $fileName);
+            $validated['image'] = "/images/$fileName";
+        }
+
+        $news->update($validated);
 
         return redirect()->route('dashboard.news.index')
             ->with('success', 'News updated successfully.');
@@ -88,11 +113,29 @@ class NewsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id): Response
+    public function destroy(News $news)
     {
-        // TODO: Implement news deletion logic
+        // dd('tes', Storage::disk('public') . '.' . $news->image);
+        dd(Storage::exists('public' . '.' . $news->image), $news->image);
+        if ($news->image) {
+            unlink(public_path('') . $news->image);
+        }
+
+        $news->delete();
 
         return redirect()->route('dashboard.news.index')
             ->with('success', 'News deleted successfully.');
+    }
+
+    /**
+     * Toggle news visibility.
+     */
+    public function toggleVisibility(News $news)
+    {
+        $news->update([
+            'is_visible' => !$news->is_visible,
+        ]);
+
+        return back()->with('success', 'News visibility updated successfully.');
     }
 }

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Dashboard\OverviewController;
 use App\Http\Middleware\AdminOnly;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 
 Route::get('/', function () {
@@ -10,10 +11,15 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('dashboard', function () {
+        return Inertia::render('dashboard');
+    })->middleware('admin')->name('dashboard');
 
     Route::middleware(AdminOnly::class)->prefix('dashboard')->name('dashboard.')->group(function () {
         Route::get('/', [OverviewController::class, 'index'])->name('index');
         Route::resource('news', \App\Http\Controllers\Dashboard\NewsController::class)->names('news');
+        Route::post('news/{news}/toggle-visibility', [\App\Http\Controllers\Dashboard\NewsController::class, 'toggleVisibility'])
+            ->name('news.toggle-visibility');
     });
 });
 
