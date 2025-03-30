@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\News;
+use File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -97,7 +98,10 @@ class NewsController extends Controller
         if ($request->hasFile('image')) {
             // Delete old image if exists
             if ($news->image) {
-                unlink(public_path('') . $news->image);
+                $isExist = File::exists(public_path('') . $news->image);
+                if ($isExist) {
+                    unlink(public_path('') . $news->image);
+                }
             }
             $fileName = time() . '.' . $request->file('image')->extension();
             $request->file('image')->move(public_path('images'), $fileName);
@@ -116,9 +120,11 @@ class NewsController extends Controller
     public function destroy(News $news)
     {
         // dd('tes', Storage::disk('public') . '.' . $news->image);
-        dd(Storage::exists('public' . '.' . $news->image), $news->image);
         if ($news->image) {
-            unlink(public_path('') . $news->image);
+            $isExist = File::exists(public_path('') . $news->image);
+            if ($isExist) {
+                unlink(public_path('') . $news->image);
+            }
         }
 
         $news->delete();
