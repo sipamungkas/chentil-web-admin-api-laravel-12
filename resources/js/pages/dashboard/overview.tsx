@@ -24,12 +24,12 @@ interface DashboardStats {
     cultureCount: number;
 }
 
-export default function Overview({ userCount }: { userCount: number }) {
+export default function Overview({ userCount, newsCount }: DashboardStats) {
     // Dummy data for demonstration
     const stats: DashboardStats = {
         userCount: userCount,
         outboundCount: 56,
-        newsCount: 89,
+        newsCount: newsCount,
         foodAndBeverageCount: 45,
         destinationCount: 78,
         cultureCount: 34,
