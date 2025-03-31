@@ -10,12 +10,12 @@ Route::get('/', function () {
     return redirect('dashboard');
 })->name('home');
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->middleware('admin')->name('dashboard');
+Route::middleware(['auth', 'verified', AdminOnly::class])->group(function () {
+    // Route::get('dashboard', function () {
+    //     return Inertia::render('dashboard/overview');
+    // })->name('dashboard');
 
-    Route::middleware(AdminOnly::class)->prefix('dashboard')->name('dashboard.')->group(function () {
+    Route::prefix('dashboard')->name('dashboard.')->group(function () {
         Route::get('/', [OverviewController::class, 'index'])->name('index');
         Route::resource('news', \App\Http\Controllers\Dashboard\NewsController::class)->names('news');
         Route::post('news/{news}/toggle-visibility', [\App\Http\Controllers\Dashboard\NewsController::class, 'toggleVisibility'])
