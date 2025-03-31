@@ -3,7 +3,7 @@ import { Switch } from '@/components/ui/switch';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { PlusIcon } from 'lucide-react';
+import { NewspaperIcon, PlusIcon } from 'lucide-react';
 
 interface News {
     id: number;
@@ -66,52 +66,66 @@ export default function Index({ title, news }: Props) {
                     </Link>
                 </div>
 
-                <div className="rounded-lg border">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left">
-                            <thead className="border-b bg-gray-50">
-                                <tr>
-                                    <th className="px-4 py-3 text-sm font-medium">Title</th>
-                                    <th className="px-4 py-3 text-sm font-medium">Description</th>
-                                    <th className="px-4 py-3 text-sm font-medium">Order</th>
-                                    <th className="px-4 py-3 text-sm font-medium">Visible</th>
-                                    <th className="px-4 py-3 text-sm font-medium">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y">
-                                {news.data.map((item) => (
-                                    <tr key={item.id}>
-                                        <td className="px-4 py-3">{item.title}</td>
-                                        <td className="px-4 py-3">
-                                            {item.description.length > 100 ? `${item.description.substring(0, 100)}...` : item.description}
-                                        </td>
-                                        <td className="px-4 py-3">{item.order}</td>
-                                        <td className="px-4 py-3">
-                                            <Switch checked={item.is_visible} onCheckedChange={() => handleVisibilityToggle(item)} />
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            <div className="flex gap-2">
-                                                <Link href={`/dashboard/news/${item.id}`}>
-                                                    <Button variant="outline" size="sm">
-                                                        View
-                                                    </Button>
-                                                </Link>
-                                                <Link href={`/dashboard/news/${item.id}/edit`}>
-                                                    <Button variant="outline" size="sm">
-                                                        Edit
-                                                    </Button>
-                                                </Link>
-                                                <Button variant="destructive" size="sm" onClick={() => handleDelete(item.id)}>
-                                                    Delete
-                                                </Button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                {news.data.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
+                        <NewspaperIcon className="h-12 w-12 text-gray-400" />
+                        <h3 className="mt-4 text-lg font-semibold text-gray-900">No news articles yet</h3>
+                        <p className="mt-2 text-sm text-gray-500">Get started by creating your first news article.</p>
+                        <Link href="/dashboard/news/create" className="mt-4">
+                            <Button>
+                                <PlusIcon className="mr-2 h-4 w-4" />
+                                Create News Article
+                            </Button>
+                        </Link>
                     </div>
-                </div>
+                ) : (
+                    <div className="rounded-lg border">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left">
+                                <thead className="border-b bg-gray-50">
+                                    <tr>
+                                        <th className="px-4 py-3 text-sm font-medium">Title</th>
+                                        <th className="px-4 py-3 text-sm font-medium">Description</th>
+                                        <th className="px-4 py-3 text-sm font-medium">Order</th>
+                                        <th className="px-4 py-3 text-sm font-medium">Visible</th>
+                                        <th className="px-4 py-3 text-sm font-medium">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y">
+                                    {news.data.map((item) => (
+                                        <tr key={item.id}>
+                                            <td className="px-4 py-3">{item.title}</td>
+                                            <td className="px-4 py-3">
+                                                {item.description.length > 100 ? `${item.description.substring(0, 100)}...` : item.description}
+                                            </td>
+                                            <td className="px-4 py-3">{item.order}</td>
+                                            <td className="px-4 py-3">
+                                                <Switch checked={item.is_visible} onCheckedChange={() => handleVisibilityToggle(item)} />
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <div className="flex gap-2">
+                                                    <Link href={`/dashboard/news/${item.id}`}>
+                                                        <Button variant="outline" size="sm">
+                                                            View
+                                                        </Button>
+                                                    </Link>
+                                                    <Link href={`/dashboard/news/${item.id}/edit`}>
+                                                        <Button variant="outline" size="sm">
+                                                            Edit
+                                                        </Button>
+                                                    </Link>
+                                                    <Button variant="destructive" size="sm" onClick={() => handleDelete(item.id)}>
+                                                        Delete
+                                                    </Button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
             </div>
         </AppLayout>
     );
