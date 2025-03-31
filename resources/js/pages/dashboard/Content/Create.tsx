@@ -7,9 +7,22 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { useState } from 'react';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 
 interface District {
+    id: number;
+    name: string;
+    regency_id: number;
+}
+
+interface Regency {
+    id: number;
+    name: string;
+    province_id: number;
+}
+
+interface Province {
     id: number;
     name: string;
 }
@@ -38,10 +51,15 @@ export default function Create({ title, category, districts }: Props) {
 
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [provinces, setProvinces] = useState<Province[]>([]);
+    const [regencies, setRegencies] = useState<Regency[]>([]);
+    const [filteredDistricts, setFilteredDistricts] = useState<District[]>([]);
     const [formData, setFormData] = useState({
         title: '',
         description: '',
         category: category,
+        province_id: '',
+        regency_id: '',
         district_id: '',
         image: null as File | null,
         since_century: '',
@@ -52,6 +70,62 @@ export default function Create({ title, category, districts }: Props) {
         order: '0',
     });
 
+    // Fetch provinces on component mount
+    useEffect(() => {
+        const fetchProvinces = async () => {
+            try {
+                console.log('Fetching provinces...');
+                const response = await axios.get<Province[]>('/api/provinces');
+                console.log('Provinces response:', response.data);
+                setProvinces(response.data);
+            } catch (error) {
+                console.error('Error fetching provinces:', error);
+                if (axios.isAxiosError(error)) {
+                    console.error('Response:', error.response?.data);
+                }
+            }
+        };
+        fetchProvinces();
+    }, []);
+
+    // Fetch regencies when province is selected
+    useEffect(() => {
+        const fetchRegencies = async () => {
+            if (formData.province_id) {
+                try {
+                    console.log('Fetching regencies for province:', formData.province_id);
+                    const response = await axios.get<Regency[]>(`/api/provinces/${formData.province_id}/regencies`);
+                    console.log('Regencies response:', response.data);
+                    setRegencies(response.data);
+                    // Clear regency and district selection when province changes
+                    setFormData(prev => ({ ...prev, regency_id: '', district_id: '' }));
+                    setFilteredDistricts([]);
+                } catch (error) {
+                    console.error('Error fetching regencies:', error);
+                    if (axios.isAxiosError(error)) {
+                        console.error('Response:', error.response?.data);
+                    }
+                }
+            } else {
+                setRegencies([]);
+                setFilteredDistricts([]);
+            }
+        };
+        fetchRegencies();
+    }, [formData.province_id]);
+
+    // Filter districts when regency is selected
+    useEffect(() => {
+        if (formData.regency_id) {
+            const filtered = districts.filter(district => district.regency_id === Number(formData.regency_id));
+            setFilteredDistricts(filtered);
+            // Clear district selection when regency changes
+            setFormData(prev => ({ ...prev, district_id: '' }));
+        } else {
+            setFilteredDistricts([]);
+        }
+    }, [formData.regency_id, districts]);
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setProcessing(true);
@@ -59,7 +133,7 @@ export default function Create({ title, category, districts }: Props) {
 
         // Append all form fields to FormData
         Object.entries(formData).forEach(([key, value]) => {
-            if (value !== null && value !== '') {
+            if (value !== null && value !== '' && key !== 'province_id' && key !== 'regency_id') {
                 if (key === 'image' && value instanceof File) {
                     data.append(key, value);
                 } else {
@@ -118,24 +192,62 @@ export default function Create({ title, category, districts }: Props) {
                                 {errors.description && <p className="mt-1 text-sm text-red-500">{errors.description}</p>}
                             </div>
 
-                            <div>
-                                <Label htmlFor="district_id">District</Label>
-                                <select
-                                    id="district_id"
-                                    className={`block w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-800 dark:bg-gray-950 dark:ring-offset-gray-950 dark:placeholder:text-gray-400 dark:focus-visible:ring-gray-300 ${
-                                        errors.district_id ? 'border-red-500' : ''
-                                    }`}
-                                    value={formData.district_id}
-                                    onChange={(e) => setFormData({ ...formData, district_id: e.target.value })}
-                                >
-                                    <option value="">Select a district</option>
-                                    {districts.map((district) => (
-                                        <option key={district.id} value={district.id}>
-                                            {district.name}
-                                        </option>
-                                    ))}
-                                </select>
-                                {errors.district_id && <p className="mt-1 text-sm text-red-500">{errors.district_id}</p>}
+                            <div className="grid grid-cols-3 gap-4">
+                                <div>
+                                    <Label htmlFor="province_id">Province</Label>
+                                    <select
+                                        id="province_id"
+                                        className={`block w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-800 dark:bg-gray-950 dark:ring-offset-gray-950 dark:placeholder:text-gray-400 dark:focus-visible:ring-gray-300`}
+                                        value={formData.province_id}
+                                        onChange={(e) => setFormData({ ...formData, province_id: e.target.value })}
+                                    >
+                                        <option value="">Select a province</option>
+                                        {provinces.map((province) => (
+                                            <option key={province.id} value={province.id}>
+                                                {province.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <Label htmlFor="regency_id">Regency</Label>
+                                    <select
+                                        id="regency_id"
+                                        className={`block w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-800 dark:bg-gray-950 dark:ring-offset-gray-950 dark:placeholder:text-gray-400 dark:focus-visible:ring-gray-300`}
+                                        value={formData.regency_id}
+                                        onChange={(e) => setFormData({ ...formData, regency_id: e.target.value })}
+                                        disabled={!formData.province_id}
+                                    >
+                                        <option value="">Select a regency</option>
+                                        {regencies.map((regency) => (
+                                            <option key={regency.id} value={regency.id}>
+                                                {regency.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <Label htmlFor="district_id">District</Label>
+                                    <select
+                                        id="district_id"
+                                        className={`block w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-800 dark:bg-gray-950 dark:ring-offset-gray-950 dark:placeholder:text-gray-400 dark:focus-visible:ring-gray-300 ${
+                                            errors.district_id ? 'border-red-500' : ''
+                                        }`}
+                                        value={formData.district_id}
+                                        onChange={(e) => setFormData({ ...formData, district_id: e.target.value })}
+                                        disabled={!formData.regency_id}
+                                    >
+                                        <option value="">Select a district</option>
+                                        {filteredDistricts.map((district) => (
+                                            <option key={district.id} value={district.id}>
+                                                {district.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {errors.district_id && <p className="mt-1 text-sm text-red-500">{errors.district_id}</p>}
+                                </div>
                             </div>
 
                             <div>
