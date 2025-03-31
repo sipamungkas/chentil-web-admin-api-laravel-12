@@ -4,6 +4,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { MapPin, PlusIcon } from 'lucide-react';
+import { useEffect } from 'react';
 
 interface Content {
     id: number;
@@ -34,6 +35,10 @@ interface Props {
 }
 
 export default function Index({ title, category, contents }: Props) {
+    useEffect(() => {
+        console.log('Content Index Props:', { title, category, contents });
+    }, [title, category, contents]);
+
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Dashboard',
@@ -46,18 +51,27 @@ export default function Index({ title, category, contents }: Props) {
     ];
 
     const handleVisibilityToggle = (content: Content) => {
+        console.log('Toggling visibility for content:', content);
         router.post(
             `/dashboard/contents/${content.id}/toggle-visibility`,
             {},
             {
                 preserveScroll: true,
+                onError: (errors) => {
+                    console.error('Error toggling visibility:', errors);
+                },
             },
         );
     };
 
     const handleDelete = (contentId: number) => {
         if (confirm('Are you sure you want to delete this item?')) {
-            router.delete(`/dashboard/contents/${contentId}`);
+            console.log('Deleting content:', contentId);
+            router.delete(`/dashboard/contents/${contentId}`, {
+                onError: (errors) => {
+                    console.error('Error deleting content:', errors);
+                },
+            });
         }
     };
 

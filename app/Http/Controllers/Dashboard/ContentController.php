@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Content;
 use App\Models\District;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
 
@@ -13,55 +14,103 @@ class ContentController extends Controller
 {
     public function destinations()
     {
-        return Inertia::render('Dashboard/Content/Index', [
+        Log::info('Fetching destinations', [
+            'category' => Content::CATEGORY_DESTINATION,
+        ]);
+
+        $contents = Content::destination()
+            ->with('district')
+            ->orderBy('order')
+            ->paginate(10);
+
+        Log::info('Found destinations', [
+            'count' => $contents->count(),
+            'total' => $contents->total(),
+        ]);
+
+        return Inertia::render('dashboard/Content/Index', [
             'title' => 'Destinations',
             'category' => Content::CATEGORY_DESTINATION,
-            'contents' => Content::destination()
-                ->with('district')
-                ->orderBy('order')
-                ->paginate(10),
+            'contents' => $contents,
         ]);
     }
 
     public function outbounds()
     {
-        return Inertia::render('Dashboard/Content/Index', [
+        Log::info('Fetching outbounds', [
+            'category' => Content::CATEGORY_OUTBOUND,
+        ]);
+
+        $contents = Content::outbound()
+            ->with('district')
+            ->orderBy('order')
+            ->paginate(10);
+
+        Log::info('Found outbounds', [
+            'count' => $contents->count(),
+            'total' => $contents->total(),
+        ]);
+
+        return Inertia::render('dashboard/Content/Index', [
             'title' => 'Outbound Activities',
             'category' => Content::CATEGORY_OUTBOUND,
-            'contents' => Content::outbound()
-                ->with('district')
-                ->orderBy('order')
-                ->paginate(10),
+            'contents' => $contents,
         ]);
     }
 
     public function cultures()
     {
-        return Inertia::render('Dashboard/Content/Index', [
+        Log::info('Fetching cultures', [
+            'category' => Content::CATEGORY_CULTURE,
+        ]);
+
+        $contents = Content::culture()
+            ->with('district')
+            ->orderBy('order')
+            ->paginate(10);
+
+        Log::info('Found cultures', [
+            'count' => $contents->count(),
+            'total' => $contents->total(),
+        ]);
+
+        return Inertia::render('dashboard/Content/Index', [
             'title' => 'Cultural Heritage',
             'category' => Content::CATEGORY_CULTURE,
-            'contents' => Content::culture()
-                ->with('district')
-                ->orderBy('order')
-                ->paginate(10),
+            'contents' => $contents,
         ]);
     }
 
     public function foodAndBeverages()
     {
-        return Inertia::render('Dashboard/Content/Index', [
+        Log::info('Fetching food and beverages', [
+            'category' => Content::CATEGORY_FOOD_AND_BEVERAGE,
+        ]);
+
+        $contents = Content::foodAndBeverage()
+            ->with('district')
+            ->orderBy('order')
+            ->paginate(10);
+
+        Log::info('Found food and beverages', [
+            'count' => $contents->count(),
+            'total' => $contents->total(),
+        ]);
+
+        return Inertia::render('dashboard/Content/Index', [
             'title' => 'Food & Beverages',
             'category' => Content::CATEGORY_FOOD_AND_BEVERAGE,
-            'contents' => Content::foodAndBeverage()
-                ->with('district')
-                ->orderBy('order')
-                ->paginate(10),
+            'contents' => $contents,
         ]);
     }
 
     public function create(Request $request)
     {
-        return Inertia::render('Dashboard/Content/Create', [
+        Log::info('Creating content', [
+            'category' => $request->category,
+        ]);
+
+        return Inertia::render('dashboard/Content/Create', [
             'title' => 'Create ' . ucfirst($request->category),
             'category' => $request->category,
             'districts' => District::orderBy('name')->get(),
@@ -70,6 +119,10 @@ class ContentController extends Controller
 
     public function store(Request $request)
     {
+        Log::info('Storing content', [
+            'category' => $request->category,
+        ]);
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -92,7 +145,12 @@ class ContentController extends Controller
             $validated['image'] = $request->file('image')->store('content-images', 'public');
         }
 
-        Content::create($validated);
+        $content = Content::create($validated);
+
+        Log::info('Content created', [
+            'id' => $content->id,
+            'category' => $content->category,
+        ]);
 
         return redirect()->route("dashboard.{$request->category}s.index")
             ->with('success', ucfirst($request->category) . ' created successfully.');
@@ -100,7 +158,12 @@ class ContentController extends Controller
 
     public function edit(Content $content)
     {
-        return Inertia::render('Dashboard/Content/Edit', [
+        Log::info('Editing content', [
+            'id' => $content->id,
+            'category' => $content->category,
+        ]);
+
+        return Inertia::render('dashboard/Content/Edit', [
             'title' => 'Edit ' . ucfirst($content->category),
             'content' => $content,
             'districts' => District::orderBy('name')->get(),
@@ -109,6 +172,11 @@ class ContentController extends Controller
 
     public function update(Request $request, Content $content)
     {
+        Log::info('Updating content', [
+            'id' => $content->id,
+            'category' => $content->category,
+        ]);
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -131,12 +199,22 @@ class ContentController extends Controller
 
         $content->update($validated);
 
+        Log::info('Content updated', [
+            'id' => $content->id,
+            'category' => $content->category,
+        ]);
+
         return redirect()->route("dashboard.{$content->category}s.index")
             ->with('success', ucfirst($content->category) . ' updated successfully.');
     }
 
     public function destroy(Content $content)
     {
+        Log::info('Deleting content', [
+            'id' => $content->id,
+            'category' => $content->category,
+        ]);
+
         $category = $content->category;
 
         if ($content->image) {
@@ -145,20 +223,42 @@ class ContentController extends Controller
 
         $content->delete();
 
+        Log::info('Content deleted', [
+            'id' => $content->id,
+            'category' => $category,
+        ]);
+
         return redirect()->route("dashboard.{$category}s.index")
             ->with('success', ucfirst($category) . ' deleted successfully.');
     }
 
     public function toggleVisibility(Content $content)
     {
+        Log::info('Toggling content visibility', [
+            'id' => $content->id,
+            'category' => $content->category,
+            'current_visibility' => $content->is_visible,
+        ]);
+
         $content->update(['is_visible' => !$content->is_visible]);
+
+        Log::info('Content visibility toggled', [
+            'id' => $content->id,
+            'category' => $content->category,
+            'new_visibility' => !$content->is_visible,
+        ]);
 
         return back()->with('success', 'Visibility updated successfully.');
     }
 
     public function show(Content $content)
     {
-        return Inertia::render('Dashboard/Content/Show', [
+        Log::info('Showing content', [
+            'id' => $content->id,
+            'category' => $content->category,
+        ]);
+
+        return Inertia::render('dashboard/Content/Show', [
             'title' => ucfirst($content->category) . ' Details',
             'content' => $content->load('district'),
         ]);
