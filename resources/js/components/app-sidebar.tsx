@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Newspaper } from 'lucide-react';
+import { BookOpen, Compass, Folder, LayoutGrid, Newspaper, Palmtree, UtensilsCrossed, Waves } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -17,6 +17,29 @@ const mainNavItems: NavItem[] = [
         title: 'News',
         href: '/dashboard/news',
         icon: Newspaper,
+    },
+];
+
+const contentNavItems: NavItem[] = [
+    {
+        title: 'Destinations',
+        href: '/dashboard/destinations',
+        icon: Compass,
+    },
+    {
+        title: 'Outbound',
+        href: '/dashboard/outbounds',
+        icon: Waves,
+    },
+    {
+        title: 'Cultural Heritage',
+        href: '/dashboard/cultures',
+        icon: Palmtree,
+    },
+    {
+        title: 'Food & Beverages',
+        href: '/dashboard/food-and-beverages',
+        icon: UtensilsCrossed,
     },
 ];
 
@@ -50,6 +73,8 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <NavMain items={mainNavItems} />
+                <div className="mt-2 px-3 text-xs font-semibold text-gray-500">Content Management</div>
+                <NavMain items={contentNavItems} />
             </SidebarContent>
 
             <SidebarFooter>
