@@ -6,7 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
@@ -34,6 +34,7 @@ interface Props {
 }
 
 export default function Create({ title, category, districts }: Props) {
+    const { auth } = usePage().props;
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Dashboard',
@@ -75,7 +76,13 @@ export default function Create({ title, category, districts }: Props) {
         const fetchProvinces = async () => {
             try {
                 console.log('Fetching provinces...');
-                const response = await axios.get<Province[]>('/api/provinces');
+                const response = await axios.get<Province[]>('/dashboard/provinces', {
+                    // headers: {
+                    //     Accept: 'application/json',
+                    //     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+                    // },
+                    // withCredentials: true,
+                });
                 console.log('Provinces response:', response.data);
                 setProvinces(response.data);
             } catch (error) {
@@ -94,11 +101,17 @@ export default function Create({ title, category, districts }: Props) {
             if (formData.province_id) {
                 try {
                     console.log('Fetching regencies for province:', formData.province_id);
-                    const response = await axios.get<Regency[]>(`/api/provinces/${formData.province_id}/regencies`);
+                    const response = await axios.get<Regency[]>(`/dashboard/provinces/${formData.province_id}/regencies`, {
+                        // headers: {
+                        //     Accept: 'application/json',
+                        //     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+                        // },
+                        // withCredentials: true,
+                    });
                     console.log('Regencies response:', response.data);
                     setRegencies(response.data);
                     // Clear regency and district selection when province changes
-                    setFormData(prev => ({ ...prev, regency_id: '', district_id: '' }));
+                    setFormData((prev) => ({ ...prev, regency_id: '', district_id: '' }));
                     setFilteredDistricts([]);
                 } catch (error) {
                     console.error('Error fetching regencies:', error);
@@ -117,10 +130,10 @@ export default function Create({ title, category, districts }: Props) {
     // Filter districts when regency is selected
     useEffect(() => {
         if (formData.regency_id) {
-            const filtered = districts.filter(district => district.regency_id === Number(formData.regency_id));
+            const filtered = districts.filter((district) => district.regency_id === Number(formData.regency_id));
             setFilteredDistricts(filtered);
             // Clear district selection when regency changes
-            setFormData(prev => ({ ...prev, district_id: '' }));
+            setFormData((prev) => ({ ...prev, district_id: '' }));
         } else {
             setFilteredDistricts([]);
         }
@@ -197,7 +210,7 @@ export default function Create({ title, category, districts }: Props) {
                                     <Label htmlFor="province_id">Province</Label>
                                     <select
                                         id="province_id"
-                                        className={`block w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-800 dark:bg-gray-950 dark:ring-offset-gray-950 dark:placeholder:text-gray-400 dark:focus-visible:ring-gray-300`}
+                                        className={`block w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-800 dark:bg-gray-950 dark:ring-offset-gray-950 dark:placeholder:text-gray-400 dark:focus-visible:ring-gray-300`}
                                         value={formData.province_id}
                                         onChange={(e) => setFormData({ ...formData, province_id: e.target.value })}
                                     >
@@ -214,7 +227,7 @@ export default function Create({ title, category, districts }: Props) {
                                     <Label htmlFor="regency_id">Regency</Label>
                                     <select
                                         id="regency_id"
-                                        className={`block w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-800 dark:bg-gray-950 dark:ring-offset-gray-950 dark:placeholder:text-gray-400 dark:focus-visible:ring-gray-300`}
+                                        className={`block w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-800 dark:bg-gray-950 dark:ring-offset-gray-950 dark:placeholder:text-gray-400 dark:focus-visible:ring-gray-300`}
                                         value={formData.regency_id}
                                         onChange={(e) => setFormData({ ...formData, regency_id: e.target.value })}
                                         disabled={!formData.province_id}
@@ -232,7 +245,7 @@ export default function Create({ title, category, districts }: Props) {
                                     <Label htmlFor="district_id">District</Label>
                                     <select
                                         id="district_id"
-                                        className={`block w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-800 dark:bg-gray-950 dark:ring-offset-gray-950 dark:placeholder:text-gray-400 dark:focus-visible:ring-gray-300 ${
+                                        className={`block w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-800 dark:bg-gray-950 dark:ring-offset-gray-950 dark:placeholder:text-gray-400 dark:focus-visible:ring-gray-300 ${
                                             errors.district_id ? 'border-red-500' : ''
                                         }`}
                                         value={formData.district_id}
@@ -352,4 +365,4 @@ export default function Create({ title, category, districts }: Props) {
             </div>
         </AppLayout>
     );
-} 
+}

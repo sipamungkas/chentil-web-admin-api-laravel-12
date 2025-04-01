@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ProvinceController;
 use App\Http\Controllers\Dashboard\ContentController;
 use App\Http\Controllers\Dashboard\OverviewController;
 use App\Http\Middleware\AdminOnly;
@@ -52,6 +53,12 @@ Route::middleware(['auth', 'verified', AdminOnly::class])->group(function () {
         Route::put('/contents/{content}', [ContentController::class, 'update'])->name('contents.update');
         Route::delete('/contents/{content}', [ContentController::class, 'destroy'])->name('contents.destroy');
         Route::post('/contents/{content}/toggle-visibility', [ContentController::class, 'toggleVisibility'])->name('contents.toggle-visibility');
+
+        // location
+
+        Route::get('/provinces', [ProvinceController::class, 'index'])->name("province");
+        Route::get('/provinces/{province}/regencies', [ProvinceController::class, 'regencies'])->name('regency');
+
     });
 });
 

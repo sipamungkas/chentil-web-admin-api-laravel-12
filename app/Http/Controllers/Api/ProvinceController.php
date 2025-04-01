@@ -10,6 +10,14 @@ class ProvinceController extends Controller
 {
     public function index(): JsonResponse
     {
+        $isAdmin = auth()->user()->role;
+        if (!$isAdmin) {
+            return response()->json([
+                "status" => "error",
+                "message" => "Unauthorized access!"
+            ]);
+        }
+        ;
         $provinces = Province::orderBy('name')->get();
         return response()->json($provinces);
     }
@@ -19,4 +27,4 @@ class ProvinceController extends Controller
         $regencies = $province->regencies()->orderBy('name')->get();
         return response()->json($regencies);
     }
-} 
+}
