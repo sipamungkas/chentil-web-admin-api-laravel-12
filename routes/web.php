@@ -13,6 +13,10 @@ Route::get('/', function () {
     return redirect('dashboard');
 })->name('home');
 
+Route::get('/unauthorized', function () {
+    return Inertia::render('Unauthorized');
+})->name('unauthorized');
+
 Route::middleware(['auth', 'verified', AdminOnly::class])->group(function () {
     // Route::get('dashboard', function () {
     //     return Inertia::render('dashboard/overview');

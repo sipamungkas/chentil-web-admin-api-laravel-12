@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignId('district_id')->nullable()->constrained()->nullOnDelete();
             $table->string('image')->nullable()->comment('Content image');
             $table->integer('since_century')->nullable()->comment('For culture category: which century it started');
-            $table->year('established_year')->nullable()->comment('For other categories: year of establishment');
+            $table->integer('established_year')->nullable()->comment('For other categories: year of establishment');
             $table->decimal('latitude', 10, 8)->nullable()->comment('Latitude for location-based queries');
             $table->decimal('longitude', 11, 8)->nullable()->comment('Longitude for location-based queries');
             $table->boolean('is_visible')->default(true);

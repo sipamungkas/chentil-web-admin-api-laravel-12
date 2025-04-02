@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Inertia\Inertia;
 
 class AdminOnly
 {
@@ -20,7 +21,11 @@ class AdminOnly
                 return response()->json(['message' => 'Unauthorized. Admin access required.'], 403);
             }
 
-            return redirect()->route('home')->with('error', 'No Permission');
+
+            return redirect()->route('unauthorized')->with('error', 'No Permission');
+
+
+            // return redirect()->route('home')->with('error', 'No Permission');
         }
 
         return $next($request);

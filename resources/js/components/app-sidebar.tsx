@@ -73,7 +73,6 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <NavMain items={mainNavItems} />
-                <div className="mt-2 px-3 text-xs font-semibold text-gray-500">Content Management</div>
                 <NavMain items={contentNavItems} />
             </SidebarContent>
 
