@@ -170,7 +170,7 @@ class ContentController extends Controller
         $district = null;
         $regency = null;
         $province = null;
-        
+
         if ($content->district) {
             $district = $content->district;
             $regency = $district->regency;

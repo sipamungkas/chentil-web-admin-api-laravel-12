@@ -14,12 +14,25 @@ interface District {
     updated_at: string;
 }
 
+interface Regency {
+    id: number;
+    name: string;
+    province_id: number;
+}
+
+interface Province {
+    id: number;
+    name: string;
+}
+
 interface Content {
     id: number;
     title: string;
     description: string;
     category: string;
     district_id: number;
+    province_id: number | null;
+    regency_id: number | null;
     image: string | null;
     since_century: string | null;
     established_year: string | null;
@@ -30,6 +43,8 @@ interface Content {
     created_at: string;
     updated_at: string;
     district: District;
+    province: Province | null;
+    regency: Regency | null;
 }
 
 interface Props {
@@ -92,8 +107,20 @@ export default function Show({ title, category, content }: Props) {
                         )}
 
                         <div className="grid grid-cols-2 gap-4 text-sm">
+                            {content.province && (
+                                <div>
+                                    <span className="font-medium">Province:</span> <span className="text-gray-600">{content.province.name}</span>
+                                </div>
+                            )}
+                            {content.regency && (
+                                <div>
+                                    <span className="font-medium">Regency:</span> <span className="text-gray-600">{content.regency.name}</span>
+                                </div>
+                            )}
                             <div>
-                                <span className="font-medium">District:</span> <span className="text-gray-600">{content.district.name}</span>
+                                <span className="font-medium">District:</span> <span className="text-gray-600">
+                                    {content.district ? content.district.name : 'Not specified'}
+                                </span>
                             </div>
                             <div>
                                 <span className="font-medium">Order:</span> <span className="text-gray-600">{content.order}</span>

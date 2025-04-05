@@ -149,7 +149,7 @@ export default function Create({ title, category }: Props) {
 
         // Append all form fields to FormData
         Object.entries(formData).forEach(([key, value]) => {
-            if (value !== null && value !== '' && key !== 'province_id' && key !== 'regency_id') {
+            if (value !== null && value !== '') {
                 if (key === 'image' && value instanceof File) {
                     data.append(key, value);
                 } else {
