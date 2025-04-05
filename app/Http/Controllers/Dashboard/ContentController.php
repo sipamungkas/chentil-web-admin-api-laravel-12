@@ -113,7 +113,6 @@ class ContentController extends Controller
         return Inertia::render('dashboard/Content/Create', [
             'title' => 'Create ' . ucfirst($request->category),
             'category' => $request->category,
-            'districts' => District::with('regency')->orderBy('name')->get(),
         ]);
     }
 

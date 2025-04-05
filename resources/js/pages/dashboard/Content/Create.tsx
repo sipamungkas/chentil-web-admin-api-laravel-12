@@ -6,7 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
@@ -30,11 +30,10 @@ interface Province {
 interface Props {
     title: string;
     category: string;
-    districts: District[];
+    initialDistricts: District[];
 }
 
-export default function Create({ title, category, districts }: Props) {
-    const { auth } = usePage().props;
+export default function Create({ title, category }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Dashboard',
@@ -54,7 +53,7 @@ export default function Create({ title, category, districts }: Props) {
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [provinces, setProvinces] = useState<Province[]>([]);
     const [regencies, setRegencies] = useState<Regency[]>([]);
-    const [filteredDistricts, setFilteredDistricts] = useState<District[]>([]);
+    const [districts, setDistricts] = useState<District[]>([]);
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -76,13 +75,7 @@ export default function Create({ title, category, districts }: Props) {
         const fetchProvinces = async () => {
             try {
                 console.log('Fetching provinces...');
-                const response = await axios.get<Province[]>('/dashboard/provinces', {
-                    // headers: {
-                    //     Accept: 'application/json',
-                    //     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
-                    // },
-                    // withCredentials: true,
-                });
+                const response = await axios.get<Province[]>('/dashboard/provinces', {});
                 console.log('Provinces response:', response.data);
                 setProvinces(response.data);
             } catch (error) {
@@ -101,18 +94,12 @@ export default function Create({ title, category, districts }: Props) {
             if (formData.province_id) {
                 try {
                     console.log('Fetching regencies for province:', formData.province_id);
-                    const response = await axios.get<Regency[]>(`/dashboard/provinces/${formData.province_id}/regencies`, {
-                        // headers: {
-                        //     Accept: 'application/json',
-                        //     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
-                        // },
-                        // withCredentials: true,
-                    });
+                    const response = await axios.get<Regency[]>(`/dashboard/provinces/${formData.province_id}/regencies`, {});
                     console.log('Regencies response:', response.data);
                     setRegencies(response.data);
                     // Clear regency and district selection when province changes
                     setFormData((prev) => ({ ...prev, regency_id: '', district_id: '' }));
-                    setFilteredDistricts([]);
+                    setDistricts([]);
                 } catch (error) {
                     console.error('Error fetching regencies:', error);
                     if (axios.isAxiosError(error)) {
@@ -121,23 +108,36 @@ export default function Create({ title, category, districts }: Props) {
                 }
             } else {
                 setRegencies([]);
-                setFilteredDistricts([]);
+                setDistricts([]);
             }
         };
         fetchRegencies();
     }, [formData.province_id]);
 
-    // Filter districts when regency is selected
+    // Fetch districts when regency is selected
     useEffect(() => {
-        if (formData.regency_id) {
-            const filtered = districts.filter((district) => district.regency_id === Number(formData.regency_id));
-            setFilteredDistricts(filtered);
-            // Clear district selection when regency changes
-            setFormData((prev) => ({ ...prev, district_id: '' }));
-        } else {
-            setFilteredDistricts([]);
-        }
-    }, [formData.regency_id, districts]);
+        const fetchDistricts = async () => {
+            if (formData.regency_id) {
+                try {
+                    console.log('Fetching districts for regency:', formData.regency_id);
+                    const response = await axios.get<District[]>(`/dashboard/regencies/${formData.regency_id}/districts`, {});
+                    // const response = await axios.get<Regency[]>(`/dashboard/provinces/${formData.province_id}/regencies`, {});
+                    console.log('Districts response:', response.data);
+                    setDistricts(response.data);
+                    // Clear district selection when regency changes
+                    setFormData((prev) => ({ ...prev, district_id: '' }));
+                } catch (error) {
+                    console.error('Error fetching districts:', error);
+                    if (axios.isAxiosError(error)) {
+                        console.error('Response:', error.response?.data);
+                    }
+                }
+            } else {
+                setDistricts([]);
+            }
+        };
+        fetchDistricts();
+    }, [formData.regency_id]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -253,7 +253,7 @@ export default function Create({ title, category, districts }: Props) {
                                         disabled={!formData.regency_id}
                                     >
                                         <option value="">Select a district</option>
-                                        {filteredDistricts.map((district) => (
+                                        {districts.map((district) => (
                                             <option key={district.id} value={district.id}>
                                                 {district.name}
                                             </option>

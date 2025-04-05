@@ -62,6 +62,7 @@ Route::middleware(['auth', 'verified', AdminOnly::class])->group(function () {
 
         Route::get('/provinces', [ProvinceController::class, 'index'])->name("province");
         Route::get('/provinces/{province}/regencies', [ProvinceController::class, 'regencies'])->name('regency');
+        Route::get('/regencies/{regency}/districts', [ProvinceController::class, 'districts'])->name('districts');
 
     });
 });
