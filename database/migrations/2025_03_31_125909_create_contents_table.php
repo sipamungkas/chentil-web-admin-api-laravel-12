@@ -35,10 +35,10 @@ return new class extends Migration
         });
 
         // Add spatial column and index for location queries
-        DB::statement('ALTER TABLE contents ADD COLUMN location POINT NOT NULL AFTER longitude');
-        DB::statement('UPDATE contents SET location = POINT(0, 0)'); // Set default point at 0,0
-        DB::statement('UPDATE contents SET location = POINT(longitude, latitude) WHERE latitude IS NOT NULL AND longitude IS NOT NULL');
-        DB::statement('CREATE SPATIAL INDEX contents_location_spatial ON contents(location)');
+        // DB::statement('ALTER TABLE contents ADD COLUMN location POINT NOT NULL AFTER longitude');
+        // DB::statement('UPDATE contents SET location = POINT(0, 0)'); // Set default point at 0,0
+        // DB::statement('UPDATE contents SET location = POINT(longitude, latitude) WHERE latitude IS NOT NULL AND longitude IS NOT NULL');
+        // DB::statement('CREATE SPATIAL INDEX contents_location_spatial ON contents(location)');
     }
 
     /**
