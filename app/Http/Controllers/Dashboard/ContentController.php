@@ -260,6 +260,7 @@ class ContentController extends Controller
         return Inertia::render('dashboard/Content/Show', [
             'title' => ucfirst($content->category) . ' Details',
             'content' => $content->load('district'),
+            'category' => $content->category
         ]);
     }
 }

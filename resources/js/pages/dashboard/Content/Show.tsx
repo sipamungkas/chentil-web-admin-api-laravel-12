@@ -7,7 +7,11 @@ import { EyeIcon, EyeOffIcon, MapPinIcon } from 'lucide-react';
 
 interface District {
     id: number;
+    code: string;
+    regency_id: number;
     name: string;
+    created_at: string;
+    updated_at: string;
 }
 
 interface Content {
@@ -15,8 +19,8 @@ interface Content {
     title: string;
     description: string;
     category: string;
-    district: District;
-    image_url: string | null;
+    district_id: number;
+    image: string | null;
     since_century: string | null;
     established_year: string | null;
     latitude: string;
@@ -25,6 +29,7 @@ interface Content {
     order: number;
     created_at: string;
     updated_at: string;
+    district: District;
 }
 
 interface Props {
@@ -68,6 +73,7 @@ export default function Show({ title, category, content }: Props) {
                                     <span>Hidden</span>
                                 </div>
                             )}
+
                             <Link href={`/dashboard/${category}s/${content.id}/edit`}>
                                 <Button variant="outline" size="sm">
                                     Edit
@@ -76,29 +82,25 @@ export default function Show({ title, category, content }: Props) {
                         </div>
                     </CardHeader>
                     <CardContent className="space-y-6">
-                        {content.image_url && (
+                        {content.image && (
                             <div>
-                                <img
-                                    src={content.image_url}
-                                    alt={content.title}
-                                    className="h-64 w-full rounded-lg object-cover"
-                                />
+                                <h3 className="mb-2 font-medium">Image</h3>
+                                <div className="relative aspect-video h-92 overflow-hidden rounded-lg border border-gray-200">
+                                    <img src={`/storage/${content.image}`} alt={content.title} className="h-full w-full object-cover" />
+                                </div>
                             </div>
                         )}
 
                         <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
-                                <span className="font-medium">District:</span>{' '}
-                                <span className="text-gray-600">{content.district.name}</span>
+                                <span className="font-medium">District:</span> <span className="text-gray-600">{content.district.name}</span>
                             </div>
                             <div>
-                                <span className="font-medium">Order:</span>{' '}
-                                <span className="text-gray-600">{content.order}</span>
+                                <span className="font-medium">Order:</span> <span className="text-gray-600">{content.order}</span>
                             </div>
                             {content.since_century && (
                                 <div>
-                                    <span className="font-medium">Century:</span>{' '}
-                                    <span className="text-gray-600">{content.since_century}</span>
+                                    <span className="font-medium">Century:</span> <span className="text-gray-600">{content.since_century}</span>
                                 </div>
                             )}
                             {content.established_year && (
@@ -109,15 +111,11 @@ export default function Show({ title, category, content }: Props) {
                             )}
                             <div>
                                 <span className="font-medium">Created At:</span>{' '}
-                                <span className="text-gray-600">
-                                    {new Date(content.created_at).toLocaleDateString()}
-                                </span>
+                                <span className="text-gray-600">{new Date(content.created_at).toLocaleDateString()}</span>
                             </div>
                             <div>
                                 <span className="font-medium">Updated At:</span>{' '}
-                                <span className="text-gray-600">
-                                    {new Date(content.updated_at).toLocaleDateString()}
-                                </span>
+                                <span className="text-gray-600">{new Date(content.updated_at).toLocaleDateString()}</span>
                             </div>
                         </div>
 
@@ -140,4 +138,4 @@ export default function Show({ title, category, content }: Props) {
             </div>
         </AppLayout>
     );
-} 
+}

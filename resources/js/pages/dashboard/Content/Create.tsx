@@ -12,8 +12,11 @@ import { useEffect, useState } from 'react';
 
 interface District {
     id: number;
-    name: string;
+    code: string;
     regency_id: number;
+    name: string;
+    created_at: string;
+    updated_at: string;
 }
 
 interface Regency {
@@ -30,7 +33,6 @@ interface Province {
 interface Props {
     title: string;
     category: string;
-    initialDistricts: District[];
 }
 
 export default function Create({ title, category }: Props) {
@@ -54,6 +56,7 @@ export default function Create({ title, category }: Props) {
     const [provinces, setProvinces] = useState<Province[]>([]);
     const [regencies, setRegencies] = useState<Regency[]>([]);
     const [districts, setDistricts] = useState<District[]>([]);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -169,7 +172,18 @@ export default function Create({ title, category }: Props) {
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files?.[0]) {
-            setFormData({ ...formData, image: e.target.files[0] });
+            const file = e.target.files[0];
+            setFormData({ ...formData, image: file });
+            
+            // Create a preview URL for the image
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            setFormData({ ...formData, image: null });
+            setImagePreview(null);
         }
     };
 
@@ -273,6 +287,19 @@ export default function Create({ title, category }: Props) {
                                     className={errors.image ? 'border-red-500' : ''}
                                 />
                                 {errors.image && <p className="mt-1 text-sm text-red-500">{errors.image}</p>}
+                                
+                                {imagePreview && (
+                                    <div className="mt-2">
+                                        <p className="mb-1 text-sm font-medium">Preview:</p>
+                                        <div className="relative aspect-video h-92 overflow-hidden rounded-md border border-gray-200">
+                                            <img 
+                                                src={imagePreview} 
+                                                alt="Image preview" 
+                                                className="h-full w-full aspect-video object-cover"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             {category === 'culture' ? (

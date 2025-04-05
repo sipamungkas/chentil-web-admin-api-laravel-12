@@ -11,7 +11,11 @@ import { useState } from 'react';
 
 interface District {
     id: number;
+    code: string;
+    regency_id: number;
     name: string;
+    created_at: string;
+    updated_at: string;
 }
 
 interface Content {
@@ -20,13 +24,14 @@ interface Content {
     description: string;
     category: string;
     district_id: number;
-    image_url: string | null;
+    image: string | null;
     since_century: string | null;
     established_year: string | null;
     latitude: string;
     longitude: string;
     is_visible: boolean;
     order: number;
+    district: District;
 }
 
 interface Props {
@@ -54,6 +59,7 @@ export default function Edit({ title, category, districts, content }: Props) {
 
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         title: content.title,
         description: content.description,
@@ -99,7 +105,18 @@ export default function Edit({ title, category, districts, content }: Props) {
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files?.[0]) {
-            setFormData({ ...formData, image: e.target.files[0] });
+            const file = e.target.files[0];
+            setFormData({ ...formData, image: file });
+
+            // Create a preview URL for the image
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            setFormData({ ...formData, image: null });
+            setImagePreview(null);
         }
     };
 
@@ -139,7 +156,7 @@ export default function Edit({ title, category, districts, content }: Props) {
                                 <Label htmlFor="district_id">District</Label>
                                 <select
                                     id="district_id"
-                                    className={`block w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-800 dark:bg-gray-950 dark:ring-offset-gray-950 dark:placeholder:text-gray-400 dark:focus-visible:ring-gray-300 ${
+                                    className={`block w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-800 dark:bg-gray-950 dark:ring-offset-gray-950 dark:placeholder:text-gray-400 dark:focus-visible:ring-gray-300 ${
                                         errors.district_id ? 'border-red-500' : ''
                                     }`}
                                     value={formData.district_id}
@@ -157,13 +174,12 @@ export default function Edit({ title, category, districts, content }: Props) {
 
                             <div>
                                 <Label htmlFor="image">Image</Label>
-                                {content.image_url && (
+                                {content.image && !imagePreview && (
                                     <div className="mb-2">
-                                        <img
-                                            src={content.image_url}
-                                            alt={content.title}
-                                            className="h-32 w-auto rounded-md object-cover"
-                                        />
+                                        <p className="mb-1 text-sm font-medium">Current Image:</p>
+                                        <div className="relative aspect-video h-92 w-auto overflow-hidden rounded-md border border-gray-200">
+                                            <img src={`/storage/${content.image}`} alt={content.title} className="h-full w-auto object-cover" />
+                                        </div>
                                     </div>
                                 )}
                                 <Input
@@ -174,6 +190,15 @@ export default function Edit({ title, category, districts, content }: Props) {
                                     className={errors.image ? 'border-red-500' : ''}
                                 />
                                 {errors.image && <p className="mt-1 text-sm text-red-500">{errors.image}</p>}
+
+                                {imagePreview && (
+                                    <div className="mt-2">
+                                        <p className="mb-1 text-sm font-medium">New Image Preview:</p>
+                                        <div className="relative h-40 w-40 overflow-hidden rounded-md border border-gray-200">
+                                            <img src={imagePreview} alt="Image preview" className="h-full w-full object-cover" />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             {category === 'culture' ? (
@@ -266,4 +291,4 @@ export default function Edit({ title, category, districts, content }: Props) {
             </div>
         </AppLayout>
     );
-} 
+}
