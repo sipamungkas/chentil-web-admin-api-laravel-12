@@ -7,7 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { useState } from 'react';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 
 interface District {
     id: number;
@@ -16,6 +17,17 @@ interface District {
     name: string;
     created_at: string;
     updated_at: string;
+}
+
+interface Regency {
+    id: number;
+    name: string;
+    province_id: number;
+}
+
+interface Province {
+    id: number;
+    name: string;
 }
 
 interface Content {
@@ -59,11 +71,16 @@ export default function Edit({ title, category, districts, content }: Props) {
 
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [provinces, setProvinces] = useState<Province[]>([]);
+    const [regencies, setRegencies] = useState<Regency[]>([]);
+    const [availableDistricts, setAvailableDistricts] = useState<District[]>([]);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         title: content.title,
         description: content.description,
         category: content.category,
+        province_id: '',
+        regency_id: '',
         district_id: String(content.district_id),
         image: null as File | null,
         since_century: content.since_century || '',
@@ -74,6 +91,91 @@ export default function Edit({ title, category, districts, content }: Props) {
         order: String(content.order),
         _method: 'PUT',
     });
+
+    // Fetch provinces on component mount
+    useEffect(() => {
+        const fetchProvinces = async () => {
+            try {
+                const response = await axios.get<Province[]>('/dashboard/provinces', {});
+                setProvinces(response.data);
+            } catch (error) {
+                console.error('Error fetching provinces:', error);
+            }
+        };
+        fetchProvinces();
+    }, []);
+
+    // Fetch regencies when province is selected
+    useEffect(() => {
+        const fetchRegencies = async () => {
+            if (formData.province_id) {
+                try {
+                    const response = await axios.get<Regency[]>(`/dashboard/provinces/${formData.province_id}/regencies`, {});
+                    setRegencies(response.data);
+                    // Clear regency and district selection when province changes
+                    setFormData((prev) => ({ ...prev, regency_id: '', district_id: '' }));
+                    setAvailableDistricts([]);
+                } catch (error) {
+                    console.error('Error fetching regencies:', error);
+                }
+            } else {
+                setRegencies([]);
+                setAvailableDistricts([]);
+            }
+        };
+        fetchRegencies();
+    }, [formData.province_id]);
+
+    // Fetch districts when regency is selected
+    useEffect(() => {
+        const fetchDistricts = async () => {
+            if (formData.regency_id) {
+                try {
+                    const response = await axios.get<District[]>(`/dashboard/regencies/${formData.regency_id}/districts`, {});
+                    setAvailableDistricts(response.data);
+                    // Clear district selection when regency changes
+                    setFormData((prev) => ({ ...prev, district_id: '' }));
+                } catch (error) {
+                    console.error('Error fetching districts:', error);
+                }
+            } else {
+                setAvailableDistricts([]);
+            }
+        };
+        fetchDistricts();
+    }, [formData.regency_id]);
+
+    // Find the initial province and regency based on the content's district
+    useEffect(() => {
+        const findInitialLocation = async () => {
+            if (content.district) {
+                try {
+                    // Find the regency for this district
+                    const regencyResponse = await axios.get<Regency>(`/dashboard/districts/${content.district.id}/regency`, {});
+                    const regency = regencyResponse.data;
+                    
+                    // Find the province for this regency
+                    const provinceResponse = await axios.get<Province>(`/dashboard/regencies/${regency.id}/province`, {});
+                    const province = provinceResponse.data;
+                    
+                    // Set the initial values
+                    setFormData(prev => ({
+                        ...prev,
+                        province_id: String(province.id),
+                        regency_id: String(regency.id),
+                        district_id: String(content.district_id)
+                    }));
+                    
+                    // Set the available districts
+                    setAvailableDistricts(districts);
+                } catch (error) {
+                    console.error('Error finding initial location:', error);
+                }
+            }
+        };
+        
+        findInitialLocation();
+    }, [content.district, content.district_id, districts]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -152,24 +254,62 @@ export default function Edit({ title, category, districts, content }: Props) {
                                 {errors.description && <p className="mt-1 text-sm text-red-500">{errors.description}</p>}
                             </div>
 
-                            <div>
-                                <Label htmlFor="district_id">District</Label>
-                                <select
-                                    id="district_id"
-                                    className={`block w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-800 dark:bg-gray-950 dark:ring-offset-gray-950 dark:placeholder:text-gray-400 dark:focus-visible:ring-gray-300 ${
-                                        errors.district_id ? 'border-red-500' : ''
-                                    }`}
-                                    value={formData.district_id}
-                                    onChange={(e) => setFormData({ ...formData, district_id: e.target.value })}
-                                >
-                                    <option value="">Select a district</option>
-                                    {districts.map((district) => (
-                                        <option key={district.id} value={district.id}>
-                                            {district.name}
-                                        </option>
-                                    ))}
-                                </select>
-                                {errors.district_id && <p className="mt-1 text-sm text-red-500">{errors.district_id}</p>}
+                            <div className="grid grid-cols-3 gap-4">
+                                <div>
+                                    <Label htmlFor="province_id">Province</Label>
+                                    <select
+                                        id="province_id"
+                                        className={`block w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-800 dark:bg-gray-950 dark:ring-offset-gray-950 dark:placeholder:text-gray-400 dark:focus-visible:ring-gray-300`}
+                                        value={formData.province_id}
+                                        onChange={(e) => setFormData({ ...formData, province_id: e.target.value })}
+                                    >
+                                        <option value="">Select a province</option>
+                                        {provinces.map((province) => (
+                                            <option key={province.id} value={province.id}>
+                                                {province.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <Label htmlFor="regency_id">Regency</Label>
+                                    <select
+                                        id="regency_id"
+                                        className={`block w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-800 dark:bg-gray-950 dark:ring-offset-gray-950 dark:placeholder:text-gray-400 dark:focus-visible:ring-gray-300`}
+                                        value={formData.regency_id}
+                                        onChange={(e) => setFormData({ ...formData, regency_id: e.target.value })}
+                                        disabled={!formData.province_id}
+                                    >
+                                        <option value="">Select a regency</option>
+                                        {regencies.map((regency) => (
+                                            <option key={regency.id} value={regency.id}>
+                                                {regency.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <Label htmlFor="district_id">District</Label>
+                                    <select
+                                        id="district_id"
+                                        className={`block w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-800 dark:bg-gray-950 dark:ring-offset-gray-950 dark:placeholder:text-gray-400 dark:focus-visible:ring-gray-300 ${
+                                            errors.district_id ? 'border-red-500' : ''
+                                        }`}
+                                        value={formData.district_id}
+                                        onChange={(e) => setFormData({ ...formData, district_id: e.target.value })}
+                                        disabled={!formData.regency_id}
+                                    >
+                                        <option value="">Select a district</option>
+                                        {availableDistricts.map((district) => (
+                                            <option key={district.id} value={district.id}>
+                                                {district.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {errors.district_id && <p className="mt-1 text-sm text-red-500">{errors.district_id}</p>}
+                                </div>
                             </div>
 
                             <div>
@@ -180,6 +320,15 @@ export default function Edit({ title, category, districts, content }: Props) {
                                         <div className="relative aspect-video h-92 w-auto overflow-hidden rounded-md border border-gray-200">
                                             <img src={`/storage/${content.image}`} alt={content.title} className="h-full w-auto object-cover" />
                                         </div>
+                                        <div className="mt-2">
+                                            <Button 
+                                                type="button" 
+                                                variant="outline" 
+                                                onClick={() => document.getElementById('image')?.click()}
+                                            >
+                                                Change Image
+                                            </Button>
+                                        </div>
                                     </div>
                                 )}
                                 <Input
@@ -187,7 +336,7 @@ export default function Edit({ title, category, districts, content }: Props) {
                                     type="file"
                                     accept="image/*"
                                     onChange={handleImageChange}
-                                    className={errors.image ? 'border-red-500' : ''}
+                                    className={`${errors.image ? 'border-red-500' : ''} ${content.image && !imagePreview ? 'hidden' : ''}`}
                                 />
                                 {errors.image && <p className="mt-1 text-sm text-red-500">{errors.image}</p>}
 
@@ -196,6 +345,18 @@ export default function Edit({ title, category, districts, content }: Props) {
                                         <p className="mb-1 text-sm font-medium">New Image Preview:</p>
                                         <div className="relative h-40 w-40 overflow-hidden rounded-md border border-gray-200">
                                             <img src={imagePreview} alt="Image preview" className="h-full w-full object-cover" />
+                                        </div>
+                                        <div className="mt-2">
+                                            <Button 
+                                                type="button" 
+                                                variant="outline" 
+                                                onClick={() => {
+                                                    setFormData({ ...formData, image: null });
+                                                    setImagePreview(null);
+                                                }}
+                                            >
+                                                Remove Image
+                                            </Button>
                                         </div>
                                     </div>
                                 )}

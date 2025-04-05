@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\Controller;
 use App\Models\Content;
 use App\Models\District;
+use App\Models\Province;
+use App\Models\Regency;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -19,7 +21,7 @@ class ContentController extends Controller
         ]);
 
         $contents = Content::destination()
-            ->with('district')
+            ->with(['district', 'province', 'regency'])
             ->orderBy('order')
             ->paginate(10);
 
@@ -42,7 +44,7 @@ class ContentController extends Controller
         ]);
 
         $contents = Content::outbound()
-            ->with('district')
+            ->with(['district', 'province', 'regency'])
             ->orderBy('order')
             ->paginate(10);
 
@@ -65,7 +67,7 @@ class ContentController extends Controller
         ]);
 
         $contents = Content::culture()
-            ->with('district')
+            ->with(['district', 'province', 'regency'])
             ->orderBy('order')
             ->paginate(10);
 
@@ -88,7 +90,7 @@ class ContentController extends Controller
         ]);
 
         $contents = Content::foodAndBeverage()
-            ->with('district')
+            ->with(['district', 'province', 'regency'])
             ->orderBy('order')
             ->paginate(10);
 
@@ -131,6 +133,8 @@ class ContentController extends Controller
                 Content::CATEGORY_CULTURE,
                 Content::CATEGORY_FOOD_AND_BEVERAGE,
             ]),
+            'province_id' => 'nullable|exists:provinces,id',
+            'regency_id' => 'nullable|exists:regencies,id',
             'district_id' => 'nullable|exists:districts,id',
             'image' => 'nullable|image|max:2048',
             'since_century' => 'nullable|integer|min:1|max:21',
@@ -162,10 +166,24 @@ class ContentController extends Controller
             'category' => $content->category,
         ]);
 
+        // Load the district's regency and province
+        $district = null;
+        $regency = null;
+        $province = null;
+        
+        if ($content->district) {
+            $district = $content->district;
+            $regency = $district->regency;
+            $province = $regency->province;
+        }
+
         return Inertia::render('dashboard/Content/Edit', [
             'title' => 'Edit ' . ucfirst($content->category),
             'content' => $content,
             'districts' => District::orderBy('name')->get(),
+            'district' => $district,
+            'regency' => $regency,
+            'province' => $province,
         ]);
     }
 
@@ -179,6 +197,8 @@ class ContentController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
+            'province_id' => 'nullable|exists:provinces,id',
+            'regency_id' => 'nullable|exists:regencies,id',
             'district_id' => 'nullable|exists:districts,id',
             'image' => 'nullable|image|max:2048',
             'since_century' => 'nullable|integer|min:1|max:21',
@@ -259,7 +279,7 @@ class ContentController extends Controller
 
         return Inertia::render('dashboard/Content/Show', [
             'title' => ucfirst($content->category) . ' Details',
-            'content' => $content->load('district'),
+            'content' => $content->load(['district', 'province', 'regency']),
             'category' => $content->category
         ]);
     }

@@ -284,7 +284,7 @@ export default function Create({ title, category }: Props) {
                                     type="file"
                                     accept="image/*"
                                     onChange={handleImageChange}
-                                    className={errors.image ? 'border-red-500' : ''}
+                                    className={`${errors.image ? 'border-red-500' : ''} ${imagePreview ? 'hidden' : ''}`}
                                 />
                                 {errors.image && <p className="mt-1 text-sm text-red-500">{errors.image}</p>}
 
@@ -293,6 +293,25 @@ export default function Create({ title, category }: Props) {
                                         <p className="mb-1 text-sm font-medium">Preview:</p>
                                         <div className="relative aspect-video h-92 overflow-hidden rounded-md border border-gray-200">
                                             <img src={imagePreview} alt="Image preview" className="aspect-video h-full w-full object-cover" />
+                                        </div>
+                                        <div className="mt-2 flex space-x-2">
+                                            <Button 
+                                                type="button" 
+                                                variant="outline" 
+                                                onClick={() => document.getElementById('image')?.click()}
+                                            >
+                                                Change Image
+                                            </Button>
+                                            <Button 
+                                                type="button" 
+                                                variant="outline" 
+                                                onClick={() => {
+                                                    setFormData({ ...formData, image: null });
+                                                    setImagePreview(null);
+                                                }}
+                                            >
+                                                Remove Image
+                                            </Button>
                                         </div>
                                     </div>
                                 )}

@@ -11,6 +11,8 @@ class Content extends Model
         'title',
         'description',
         'category',
+        'province_id',
+        'regency_id',
         'district_id',
         'image',
         'since_century',
@@ -35,6 +37,16 @@ class Content extends Model
     const CATEGORY_OUTBOUND = 'outbound';
     const CATEGORY_CULTURE = 'culture';
     const CATEGORY_FOOD_AND_BEVERAGE = 'food_and_beverage';
+
+    public function province(): BelongsTo
+    {
+        return $this->belongsTo(Province::class);
+    }
+
+    public function regency(): BelongsTo
+    {
+        return $this->belongsTo(Regency::class);
+    }
 
     public function district(): BelongsTo
     {
