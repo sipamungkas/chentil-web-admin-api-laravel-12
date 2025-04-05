@@ -174,7 +174,7 @@ export default function Create({ title, category }: Props) {
         if (e.target.files?.[0]) {
             const file = e.target.files[0];
             setFormData({ ...formData, image: file });
-            
+
             // Create a preview URL for the image
             const reader = new FileReader();
             reader.onloadend = () => {
@@ -287,22 +287,18 @@ export default function Create({ title, category }: Props) {
                                     className={errors.image ? 'border-red-500' : ''}
                                 />
                                 {errors.image && <p className="mt-1 text-sm text-red-500">{errors.image}</p>}
-                                
+
                                 {imagePreview && (
                                     <div className="mt-2">
                                         <p className="mb-1 text-sm font-medium">Preview:</p>
                                         <div className="relative aspect-video h-92 overflow-hidden rounded-md border border-gray-200">
-                                            <img 
-                                                src={imagePreview} 
-                                                alt="Image preview" 
-                                                className="h-full w-full aspect-video object-cover"
-                                            />
+                                            <img src={imagePreview} alt="Image preview" className="aspect-video h-full w-full object-cover" />
                                         </div>
                                     </div>
                                 )}
                             </div>
 
-                            {category === 'culture' ? (
+                            {category === 'culture' && (
                                 <div>
                                     <Label htmlFor="since_century">Century</Label>
                                     <Input
@@ -316,7 +312,9 @@ export default function Create({ title, category }: Props) {
                                     />
                                     {errors.since_century && <p className="mt-1 text-sm text-red-500">{errors.since_century}</p>}
                                 </div>
-                            ) : (
+                            )}
+                            {/* : 
+                            (
                                 <div>
                                     <Label htmlFor="established_year">Established Year</Label>
                                     <Input
@@ -330,7 +328,7 @@ export default function Create({ title, category }: Props) {
                                     />
                                     {errors.established_year && <p className="mt-1 text-sm text-red-500">{errors.established_year}</p>}
                                 </div>
-                            )}
+                            )} */}
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
