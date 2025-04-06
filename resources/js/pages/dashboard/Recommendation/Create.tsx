@@ -172,7 +172,11 @@ export default function Create() {
                                             }`}
                                             onClick={() => setSelectedContentId(content.id)}
                                         >
-                                            <img src={content.image} alt={content.title} className="mb-2 h-48 w-full rounded-lg object-cover" />
+                                            <img
+                                                src={`/storage/${content.image}`}
+                                                alt={content.title}
+                                                className="mb-2 aspect-video h-48 w-full rounded-lg object-cover"
+                                            />
                                             <h3 className="font-semibold">{content.title}</h3>
                                             <p className="mb-1 text-sm text-gray-600">{trimText(content.description)}</p>
                                             <p className="text-sm text-gray-600">

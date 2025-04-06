@@ -6,7 +6,6 @@ import { Head, Link } from '@inertiajs/react';
 import axios from 'axios';
 import { Plus, Sparkles, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautiful-dnd';
 import { toast } from 'react-hot-toast';
 
 interface Content {
@@ -35,6 +34,8 @@ export default function Index({ recommendations }: Props) {
     const [items, setItems] = useState<Content[]>(recommendations || []);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 6;
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -57,44 +58,6 @@ export default function Index({ recommendations }: Props) {
         }
     }, [recommendations]);
 
-    const handleDragEnd = (result: DropResult) => {
-        if (!result.destination) return;
-
-        const reorderedItems = Array.from(items);
-        const [removed] = reorderedItems.splice(result.source.index, 1);
-        reorderedItems.splice(result.destination.index, 0, removed);
-
-        // Update the order property for each item
-        const updatedItems = reorderedItems.map((item, index) => ({
-            ...item,
-            order: index,
-        }));
-
-        setItems(updatedItems);
-
-        // Send the new order to the server
-        const orders = updatedItems.map((item) => ({
-            id: item.id,
-            order: item.order,
-        }));
-
-        setLoading(true);
-        axios
-            .put('/dashboard/recommendations/update-order', { orders })
-            .then(() => {
-                toast.success('Order updated successfully');
-            })
-            .catch((error) => {
-                console.error('Error updating order:', error);
-                toast.error('Failed to update order');
-                // Revert to the original order if there's an error
-                setItems(recommendations);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    };
-
     const handleDelete = async (id: number) => {
         if (!confirm('Are you sure you want to remove this content from recommendations?')) {
             return;
@@ -112,6 +75,14 @@ export default function Index({ recommendations }: Props) {
             setLoading(false);
         }
     };
+
+    // Calculate pagination
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = items.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(items.length / itemsPerPage);
+
+    const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
     if (error) {
         return (
@@ -180,47 +151,77 @@ export default function Index({ recommendations }: Props) {
                             </Link>
                         </div>
                     ) : (
-                        <DragDropContext onDragEnd={handleDragEnd}>
-                            <Droppable droppableId="recommendations">
-                                {(provided) => (
-                                    <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-4">
-                                        {items.map((item, index) => (
-                                            <Draggable key={item.id} draggableId={item.id.toString()} index={index}>
-                                                {(provided) => (
-                                                    <div
-                                                        ref={provided.innerRef}
-                                                        {...provided.draggableProps}
-                                                        {...provided.dragHandleProps}
-                                                        className="flex items-center gap-4 rounded-lg border bg-white p-4 shadow-sm"
-                                                    >
-                                                        <div className="flex-grow">
-                                                            <h3 className="font-semibold">{item.title}</h3>
-                                                            <p className="text-base text-gray-600">{trimText(item.description)}</p>
-                                                            <p className="text-base text-gray-600">{item.category}</p>
-                                                            <p className="text-sm text-gray-600">
-                                                                {item.district?.name}, {item.district?.regency?.name},{' '}
-                                                                {item.district?.regency?.province?.name}
-                                                            </p>
-                                                        </div>
-                                                        <div className="flex items-center gap-2">
-                                                            <Button
-                                                                variant="outline"
-                                                                size="icon"
-                                                                onClick={() => handleDelete(item.id)}
-                                                                className="text-red-500 hover:bg-red-50 hover:text-red-700"
-                                                            >
-                                                                <Trash2 className="h-4 w-4" />
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </Draggable>
-                                        ))}
-                                        {provided.placeholder}
+                        <>
+                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                {currentItems.map((item) => (
+                                    <div
+                                        key={item.id}
+                                        className="overflow-hidden rounded-lg border bg-white shadow-sm transition-all hover:shadow-md"
+                                    >
+                                        <div className="relative h-48 w-full">
+                                            <img
+                                                src={`/storage/${item.image}`}
+                                                alt={item.title}
+                                                className="aspect-video h-48 w-full rounded-lg object-cover"
+                                            />
+                                            <div className="absolute right-0 bottom-0 left-0 bg-gradient-to-t from-black/70 to-transparent p-3">
+                                                <span className="rounded-full bg-white/20 px-3 py-1 text-xs text-white backdrop-blur-sm capitalize">
+                                                    {item.category}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="p-4">
+                                            <h3 className="mb-2 text-lg font-semibold capitalize">{item.title}</h3>
+                                            <p className="mb-3 text-sm text-gray-600">{trimText(item.description)}</p>
+                                            <p className="mb-4 text-xs text-gray-500">
+                                                {item.district?.name}, {item.district?.regency?.name}, {item.district?.regency?.province?.name}
+                                            </p>
+                                            <div className="flex justify-end">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => handleDelete(item.id)}
+                                                    className="text-red-500 hover:bg-red-50 hover:text-red-700"
+                                                >
+                                                    <Trash2 className="mr-2 h-4 w-4" />
+                                                    Remove
+                                                </Button>
+                                            </div>
+                                        </div>
                                     </div>
-                                )}
-                            </Droppable>
-                        </DragDropContext>
+                                ))}
+                            </div>
+
+                            {/* Pagination */}
+                            {totalPages > 1 && (
+                                <div className="mt-6 flex justify-center">
+                                    <nav className="flex items-center space-x-2">
+                                        <Button variant="outline" size="sm" onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>
+                                            Previous
+                                        </Button>
+                                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+                                            <Button
+                                                key={number}
+                                                variant={currentPage === number ? 'default' : 'outline'}
+                                                size="sm"
+                                                onClick={() => paginate(number)}
+                                                className={currentPage === number ? 'bg-primary text-white' : ''}
+                                            >
+                                                {number}
+                                            </Button>
+                                        ))}
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => paginate(currentPage + 1)}
+                                            disabled={currentPage === totalPages}
+                                        >
+                                            Next
+                                        </Button>
+                                    </nav>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </div>
