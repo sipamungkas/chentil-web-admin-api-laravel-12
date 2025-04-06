@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Compass, Folder, LayoutGrid, Newspaper, Palmtree, Sparkles, UtensilsCrossed, Waves } from 'lucide-react';
+import { BookOpen, Calendar, Compass, Folder, LayoutGrid, Newspaper, Palmtree, Sparkles, UtensilsCrossed, Waves } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -45,6 +45,11 @@ const contentNavItems: NavItem[] = [
         title: 'Recommendations',
         href: '/dashboard/recommendations',
         icon: Sparkles,
+    },
+    {
+        title: 'Event Calendar',
+        href: '/dashboard/calendar',
+        icon: Calendar,
     },
 ];
 

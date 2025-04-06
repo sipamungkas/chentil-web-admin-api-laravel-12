@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\ProvinceController;
 use App\Http\Controllers\Dashboard\ContentController;
 use App\Http\Controllers\Dashboard\OverviewController;
 use App\Http\Controllers\Dashboard\RecommendationController;
+use App\Http\Controllers\Dashboard\EventController;
 use App\Http\Middleware\AdminOnly;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -75,6 +76,13 @@ Route::middleware(['auth', 'verified', AdminOnly::class])->group(function () {
         Route::get('/provinces', [ProvinceController::class, 'index'])->name("province");
         Route::get('/provinces/{province}/regencies', [ProvinceController::class, 'regencies'])->name('regency');
         Route::get('/regencies/{regency}/districts', [ProvinceController::class, 'districts'])->name('districts');
+
+        // Calendar routes
+        Route::get('/calendar', [EventController::class, 'index'])->name('calendar');
+        Route::get('/events', [EventController::class, 'getEvents'])->name('events.index');
+        Route::post('/events', [EventController::class, 'store'])->name('events.store');
+        Route::put('/events/{event}', [EventController::class, 'update'])->name('events.update');
+        Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('events.destroy');
 
     });
 });
