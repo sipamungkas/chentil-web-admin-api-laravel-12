@@ -17,12 +17,34 @@ class RecommendationController extends Controller
     public function index()
     {
         Log::info('Accessing recommendations index');
-        $recommendations = Content::where('recommendation', true)
-            ->orderBy('order')
-            ->get();
-        return Inertia::render('dashboard/Recommendation/Index', [
-            'recommendations' => $recommendations
-        ]);
+        try {
+            $recommendations = Content::where('recommendation', true)
+                ->with([
+                    'district:id,name,regency_id',
+                    'district.regency:id,name,province_id',
+                    'district.regency.province:id,name'
+                ])
+                ->orderBy('order')
+                ->get();
+
+            Log::info('Found recommendations', [
+                'count' => $recommendations->count()
+            ]);
+
+            return Inertia::render('dashboard/Recommendation/Index', [
+                'recommendations' => $recommendations
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to fetch recommendations', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return Inertia::render('dashboard/Recommendation/Index', [
+                'recommendations' => [],
+                'error' => 'Failed to load recommendations: ' . $e->getMessage()
+            ]);
+        }
     }
 
     /**

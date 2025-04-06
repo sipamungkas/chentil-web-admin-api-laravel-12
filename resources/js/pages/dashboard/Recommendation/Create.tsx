@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
+import { trimText } from '@/lib/utils';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import axios from 'axios';
@@ -13,6 +14,7 @@ interface Content {
     title: string;
     image: string;
     description: string;
+    category: string;
     district: {
         name: string;
         regency: {
@@ -170,8 +172,9 @@ export default function Create() {
                                             }`}
                                             onClick={() => setSelectedContentId(content.id)}
                                         >
+                                            <img src={content.image} alt={content.title} className="mb-2 h-48 w-full rounded-lg object-cover" />
                                             <h3 className="font-semibold">{content.title}</h3>
-                                            <p className="text-primary text-base">{content.description}</p>
+                                            <p className="mb-1 text-sm text-gray-600">{trimText(content.description)}</p>
                                             <p className="text-sm text-gray-600">
                                                 {content?.district.name}, {content?.district.regency.name}, {content?.district.regency.province.name}
                                             </p>
