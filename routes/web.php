@@ -87,5 +87,10 @@ Route::middleware(['auth', 'verified', AdminOnly::class])->group(function () {
     });
 });
 
+// Landing page route
+Route::get('/', function () {
+    return Inertia::render('Landing');
+})->name('landing');
+
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
