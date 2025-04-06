@@ -70,9 +70,10 @@ export default function Index({ recommendations }: Props) {
             toast.success('Content removed from recommendations');
         } catch (error) {
             console.error('Error deleting recommendation:', error);
-            const errorMessage = axios.isAxiosError(error) && error.response?.data?.error 
-                ? error.response.data.error 
-                : 'Failed to remove content from recommendations';
+            const errorMessage =
+                axios.isAxiosError(error) && error.response?.data?.error
+                    ? error.response.data.error
+                    : 'Failed to remove content from recommendations';
             toast.error(errorMessage);
         } finally {
             setLoading(false);
