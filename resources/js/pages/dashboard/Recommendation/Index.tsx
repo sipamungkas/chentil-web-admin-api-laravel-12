@@ -70,7 +70,10 @@ export default function Index({ recommendations }: Props) {
             toast.success('Content removed from recommendations');
         } catch (error) {
             console.error('Error deleting recommendation:', error);
-            toast.error('Failed to remove content from recommendations');
+            const errorMessage = axios.isAxiosError(error) && error.response?.data?.error 
+                ? error.response.data.error 
+                : 'Failed to remove content from recommendations';
+            toast.error(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -165,7 +168,7 @@ export default function Index({ recommendations }: Props) {
                                                 className="aspect-video h-48 w-full rounded-lg object-cover"
                                             />
                                             <div className="absolute right-0 bottom-0 left-0 bg-gradient-to-t from-black/70 to-transparent p-3">
-                                                <span className="rounded-full bg-white/20 px-3 py-1 text-xs text-white backdrop-blur-sm capitalize">
+                                                <span className="rounded-full bg-white/20 px-3 py-1 text-xs text-white capitalize backdrop-blur-sm">
                                                     {item.category}
                                                 </span>
                                             </div>

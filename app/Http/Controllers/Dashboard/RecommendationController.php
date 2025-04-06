@@ -137,22 +137,22 @@ class RecommendationController extends Controller
     /**
      * Remove the specified recommendation from storage.
      */
-    public function destroy(Content $recommendation)
+    public function destroy($id)
     {
-        Log::info('Deleting recommendation', ['recommendation_id' => $recommendation->id]);
+        Log::info('Deleting recommendation', ['recommendation_id' => $id]);
 
         try {
-            $recommendation->update(['recommendation' => false]);
+            $content = Content::findOrFail($id);
+            $content->update(['recommendation' => false]);
 
-            Log::info('Recommendation deleted successfully', ['recommendation_id' => $recommendation->id]);
-            return redirect()->route('dashboard.recommendations.index')
-                ->with('success', 'Content removed from recommendations successfully');
+            Log::info('Recommendation deleted successfully', ['recommendation_id' => $id]);
+            return response()->json(['message' => 'Content removed from recommendations successfully']);
         } catch (\Exception $e) {
             Log::error('Failed to delete recommendation', [
                 'error' => $e->getMessage(),
-                'recommendation_id' => $recommendation->id
+                'recommendation_id' => $id
             ]);
-            return back()->with('error', 'Failed to remove content from recommendations');
+            return response()->json(['error' => 'Failed to remove content from recommendations'], 500);
         }
     }
 
