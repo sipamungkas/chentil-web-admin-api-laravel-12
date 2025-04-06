@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Content extends Model
 {
@@ -15,6 +16,7 @@ class Content extends Model
         'regency_id',
         'district_id',
         'image',
+        'recommendation',
         'since_century',
         'established_year',
         'latitude',
@@ -25,6 +27,7 @@ class Content extends Model
 
     protected $casts = [
         'is_visible' => 'boolean',
+        'recommendation' => 'boolean',
         'since_century' => 'integer',
         'established_year' => 'integer',
         'latitude' => 'decimal:8',
@@ -51,6 +54,16 @@ class Content extends Model
     public function district(): BelongsTo
     {
         return $this->belongsTo(District::class);
+    }
+
+    /**
+     * Get the recommendations for the content.
+     */
+    public function recommendations(): BelongsToMany
+    {
+        return $this->belongsToMany(Recommendation::class, 'content_recommendation')
+            ->withPivot('order')
+            ->orderByPivot('order', 'asc');
     }
 
     // Scope for each category

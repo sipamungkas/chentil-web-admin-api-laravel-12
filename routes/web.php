@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\ProvinceController;
 use App\Http\Controllers\Dashboard\ContentController;
 use App\Http\Controllers\Dashboard\OverviewController;
+use App\Http\Controllers\Dashboard\RecommendationController;
 use App\Http\Middleware\AdminOnly;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -52,11 +53,22 @@ Route::middleware(['auth', 'verified', AdminOnly::class])->group(function () {
         Route::get('/food-and-beverages/{content}', [ContentController::class, 'show'])->name('food-and-beverages.show');
         Route::get('/food-and-beverages/{content}/edit', [ContentController::class, 'edit'])->name('food-and-beverages.edit');
 
-        // Common content routes
+        // Content CRUD
         Route::post('/contents', [ContentController::class, 'store'])->name('contents.store');
         Route::put('/contents/{content}', [ContentController::class, 'update'])->name('contents.update');
         Route::delete('/contents/{content}', [ContentController::class, 'destroy'])->name('contents.destroy');
         Route::post('/contents/{content}/toggle-visibility', [ContentController::class, 'toggleVisibility'])->name('contents.toggle-visibility');
+
+        // Recommendations
+        Route::get('/recommendations', [RecommendationController::class, 'index'])->name('recommendations.index');
+        Route::get('/recommendations/create', [RecommendationController::class, 'create'])->name('recommendations.create');
+        Route::post('/recommendations', [RecommendationController::class, 'store'])->name('recommendations.store');
+        Route::get('/recommendations/contents', [RecommendationController::class, 'getContents'])->name('recommendations.contents');
+        Route::put('/recommendations/update-order', [RecommendationController::class, 'updateOrder'])->name('recommendations.update-order');
+        Route::get('/recommendations/{recommendation}', [RecommendationController::class, 'show'])->name('recommendations.show');
+        Route::get('/recommendations/{recommendation}/edit', [RecommendationController::class, 'edit'])->name('recommendations.edit');
+        Route::put('/recommendations/{recommendation}', [RecommendationController::class, 'update'])->name('recommendations.update');
+        Route::delete('/recommendations/{recommendation}', [RecommendationController::class, 'destroy'])->name('recommendations.destroy');
 
         // location
 
