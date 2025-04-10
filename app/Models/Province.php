@@ -4,12 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Province extends Model
 {
     protected $fillable = [
         'code',
         'name',
+        'island_id',
+        'description',
     ];
 
     /**
@@ -34,5 +37,10 @@ class Province extends Model
     public function villages(): HasMany
     {
         return $this->hasManyThrough(Village::class, District::class);
+    }
+
+    public function island(): BelongsTo
+    {
+        return $this->belongsTo(Island::class)->withDefault();
     }
 } 

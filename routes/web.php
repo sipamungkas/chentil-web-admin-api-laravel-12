@@ -5,11 +5,11 @@ use App\Http\Controllers\Dashboard\ContentController;
 use App\Http\Controllers\Dashboard\OverviewController;
 use App\Http\Controllers\Dashboard\RecommendationController;
 use App\Http\Controllers\Dashboard\EventController;
+use App\Http\Controllers\IslandController;
+use App\Http\Controllers\ProvinceController as DashboardProvinceController;
 use App\Http\Middleware\AdminOnly;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-
-
 
 Route::get('/', function () {
     return redirect('dashboard');
@@ -20,15 +20,30 @@ Route::get('/unauthorized', function () {
 })->name('unauthorized');
 
 Route::middleware(['auth', 'verified', AdminOnly::class])->group(function () {
-    // Route::get('dashboard', function () {
-    //     return Inertia::render('dashboard/overview');
-    // })->name('dashboard');
-
     Route::prefix('dashboard')->name('dashboard.')->group(function () {
         Route::get('/', [OverviewController::class, 'index'])->name('index');
         Route::resource('news', \App\Http\Controllers\Dashboard\NewsController::class)->names('news');
         Route::post('news/{news}/toggle-visibility', [\App\Http\Controllers\Dashboard\NewsController::class, 'toggleVisibility'])
             ->name('news.toggle-visibility');
+
+        // Islands and Provinces
+        Route::resource('islands', IslandController::class);
+        
+        // Standalone provinces
+        Route::get('provinces', [DashboardProvinceController::class, 'index'])->name('provinces.index');
+        Route::get('provinces/create', [DashboardProvinceController::class, 'create'])->name('provinces.create');
+        Route::post('provinces', [DashboardProvinceController::class, 'store'])->name('provinces.store');
+        Route::get('provinces/{province}/edit', [DashboardProvinceController::class, 'edit'])->name('provinces.edit');
+        Route::put('provinces/{province}', [DashboardProvinceController::class, 'update'])->name('provinces.update');
+        Route::delete('provinces/{province}', [DashboardProvinceController::class, 'destroy'])->name('provinces.destroy');
+
+        // Island-specific provinces
+        Route::get('islands/{island}/provinces', [DashboardProvinceController::class, 'islandIndex'])->name('islands.provinces.index');
+        Route::get('islands/{island}/provinces/create', [DashboardProvinceController::class, 'islandCreate'])->name('islands.provinces.create');
+        Route::post('islands/{island}/provinces', [DashboardProvinceController::class, 'islandStore'])->name('islands.provinces.store');
+        Route::get('islands/{island}/provinces/{province}/edit', [DashboardProvinceController::class, 'islandEdit'])->name('islands.provinces.edit');
+        Route::put('islands/{island}/provinces/{province}', [DashboardProvinceController::class, 'islandUpdate'])->name('islands.provinces.update');
+        Route::delete('islands/{island}/provinces/{province}', [DashboardProvinceController::class, 'islandDestroy'])->name('islands.provinces.destroy');
 
         // Destinations
         Route::get('/destinations', [ContentController::class, 'destinations'])->name('destinations.index');
@@ -72,7 +87,6 @@ Route::middleware(['auth', 'verified', AdminOnly::class])->group(function () {
         Route::delete('/recommendations/{recommendation}', [RecommendationController::class, 'destroy'])->name('recommendations.destroy');
 
         // location
-
         Route::get('/provinces', [ProvinceController::class, 'index'])->name("province");
         Route::get('/provinces/{province}/regencies', [ProvinceController::class, 'regencies'])->name('regency');
         Route::get('/regencies/{regency}/districts', [ProvinceController::class, 'districts'])->name('districts');
@@ -83,7 +97,6 @@ Route::middleware(['auth', 'verified', AdminOnly::class])->group(function () {
         Route::post('/events', [EventController::class, 'store'])->name('events.store');
         Route::put('/events/{event}', [EventController::class, 'update'])->name('events.update');
         Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('events.destroy');
-
     });
 });
 

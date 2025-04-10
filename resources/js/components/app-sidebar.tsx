@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Calendar, Compass, Folder, LayoutGrid, Newspaper, Palmtree, Sparkles, UtensilsCrossed, Waves } from 'lucide-react';
+import { BookOpen, Calendar, Compass, Folder, LayoutGrid, Newspaper, Palmtree, Sparkles, UtensilsCrossed, Waves, Map, Building2 } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -21,6 +21,16 @@ const mainNavItems: NavItem[] = [
 ];
 
 const contentNavItems: NavItem[] = [
+    {
+        title: 'Islands',
+        href: '/dashboard/islands',
+        icon: Map,
+    },
+    {
+        title: 'Provinces',
+        href: '/dashboard/provinces',
+        icon: Building2,
+    },
     {
         title: 'Destinations',
         href: '/dashboard/destinations',
