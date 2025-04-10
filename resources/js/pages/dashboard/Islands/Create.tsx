@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import AppLayout from '@/layouts/app-layout';
+import { BreadcrumbItem } from '@/types';
 
 type FormData = {
     name: string;
@@ -27,37 +29,41 @@ export default function Create() {
         });
     };
 
-    return (
-        <>
-            <Head title="Create Island" />
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Dashboard',
+            href: '/dashboard',
+        },
+        {
+            title: 'Islands',
+            href: '/dashboard/islands',
+        },
+        {
+            title: 'Edit',
+            href: '/dashboard/islands/edit',
+        },
+    ];
 
-            <div className="container py-10">
-                <div className="mb-8">
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Islands" />
+
+            <div className="flex flex-col gap-4 p-4">
+                <div className="flex items-center justify-between">
                     <h2 className="text-3xl font-bold tracking-tight">Create Island</h2>
-                    <p className="text-muted-foreground">
-                        Add a new island to the system
-                    </p>
+                    <p className="text-muted-foreground">Add a new island to the system</p>
                 </div>
 
                 <form onSubmit={submit} className="space-y-6">
                     <div className="space-y-2">
                         <Label htmlFor="name">Name</Label>
-                        <Input
-                            id="name"
-                            value={data.name}
-                            onChange={(e) => setData('name', e.target.value)}
-                            required
-                        />
+                        <Input id="name" value={data.name} onChange={(e) => setData('name', e.target.value)} required />
                         <InputError message={errors.name} />
                     </div>
 
                     <div className="space-y-2">
                         <Label htmlFor="description">Description</Label>
-                        <Textarea
-                            id="description"
-                            value={data.description}
-                            onChange={(e) => setData('description', e.target.value)}
-                        />
+                        <Textarea id="description" value={data.description} onChange={(e) => setData('description', e.target.value)} />
                         <InputError message={errors.description} />
                     </div>
 
@@ -67,6 +73,6 @@ export default function Create() {
                     </Button>
                 </form>
             </div>
-        </>
+        </AppLayout>
     );
-} 
+}

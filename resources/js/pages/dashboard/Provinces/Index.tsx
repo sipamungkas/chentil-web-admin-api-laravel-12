@@ -16,22 +16,27 @@ interface Island {
     id: number;
     name: string;
     description: string | null;
-    provinces: Array<{
-        id: number;
-        name: string;
-        description: string | null;
-        island_id: number | null;
-    }>;
+}
+
+interface Province {
+    id: number;
+    name: string;
+    description: string | null;
+    island_id: number | null;
+    island?: Island;
 }
 
 interface Props {
     island?: Island;
-    provinces: Array<{
-        id: number;
-        name: string;
-        description: string | null;
-        island_id: number | null;
-    }>;
+    provinces: {
+        data: Province[];
+        current_page: number;
+        last_page: number;
+        per_page: number;
+        total: number;
+        from: number;
+        to: number;
+    };
 }
 
 export default function Index({ island, provinces }: Props) {
@@ -49,7 +54,7 @@ export default function Index({ island, provinces }: Props) {
                             {island ? 'Manage provinces in this island' : 'Manage all provinces'}
                         </p>
                     </div>
-                    <Link href={island ? route('islands.provinces.create', island.id) : route('provinces.create')}>
+                    <Link href={island ? route('dashboard.islands.provinces.create', island.id) : route('dashboard.provinces.create')}>
                         <Button>
                             <Plus className="mr-2 h-4 w-4" />
                             Add Province
@@ -65,7 +70,18 @@ export default function Index({ island, provinces }: Props) {
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <DataTable columns={columns} data={provinces} />
+                        <DataTable 
+                            columns={columns} 
+                            data={provinces.data}
+                            pagination={{
+                                currentPage: provinces.current_page,
+                                lastPage: provinces.last_page,
+                                perPage: provinces.per_page,
+                                total: provinces.total,
+                                from: provinces.from,
+                                to: provinces.to
+                            }}
+                        />
                     </CardContent>
                 </Card>
             </div>

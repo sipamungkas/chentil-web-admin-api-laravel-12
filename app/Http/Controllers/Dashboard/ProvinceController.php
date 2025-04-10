@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Dashboard;
+
+use App\Http\Controllers\Controller;
 
 use App\Models\Island;
 use App\Models\Province;
@@ -13,7 +15,10 @@ class ProvinceController extends Controller
     // Standalone provinces
     public function index(): Response
     {
-        $provinces = Province::latest()->get();
+        $provinces = Province::with('island')
+            ->latest()
+            ->paginate(10);
+
         return Inertia::render('Provinces/Index', [
             'provinces' => $provinces
         ]);
@@ -75,7 +80,11 @@ class ProvinceController extends Controller
     // Island-specific provinces
     public function islandIndex(Island $island): Response
     {
-        $provinces = $island->provinces()->latest()->get();
+        $provinces = $island->provinces()
+            ->with('island')
+            ->latest()
+            ->paginate(10);
+
         return Inertia::render('Provinces/Index', [
             'island' => $island,
             'provinces' => $provinces

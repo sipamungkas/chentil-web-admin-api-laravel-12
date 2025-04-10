@@ -5,8 +5,8 @@ use App\Http\Controllers\Dashboard\ContentController;
 use App\Http\Controllers\Dashboard\OverviewController;
 use App\Http\Controllers\Dashboard\RecommendationController;
 use App\Http\Controllers\Dashboard\EventController;
-use App\Http\Controllers\IslandController;
-use App\Http\Controllers\ProvinceController as DashboardProvinceController;
+use App\Http\Controllers\Dashboard\IslandController;
+use App\Http\Controllers\Dashboard\ProvinceController as DashboardProvinceController;
 use App\Http\Middleware\AdminOnly;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -28,7 +28,7 @@ Route::middleware(['auth', 'verified', AdminOnly::class])->group(function () {
 
         // Islands and Provinces
         Route::resource('islands', IslandController::class);
-        
+
         // Standalone provinces
         Route::get('provinces', [DashboardProvinceController::class, 'index'])->name('provinces.index');
         Route::get('provinces/create', [DashboardProvinceController::class, 'create'])->name('provinces.create');

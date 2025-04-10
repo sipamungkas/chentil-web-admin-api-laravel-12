@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Dashboard;
 
+use App\Http\Controllers\Controller;
 use App\Models\Island;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -11,33 +12,37 @@ class IslandController extends Controller
 {
     public function index(): Response
     {
-        return Inertia::render('Islands/Index', [
-            'islands' => Island::with('provinces')->latest()->get(),
+        $islands = Island::withCount('provinces')
+            ->latest()
+            ->paginate(10);
+
+        return Inertia::render('dashboard/Islands/Index', [
+            'islands' => $islands
         ]);
     }
 
     public function create(): Response
     {
-        return Inertia::render('Islands/Create');
+        return Inertia::render('dashboard/Islands/Create');
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'description' => 'nullable|string'
         ]);
 
         Island::create($validated);
 
-        return redirect()->route('islands.index')
+        return redirect()->route('dashboard.islands.index')
             ->with('success', 'Island created successfully.');
     }
 
     public function edit(Island $island): Response
     {
-        return Inertia::render('Islands/Edit', [
-            'island' => $island->load('provinces'),
+        return Inertia::render('dashboard/Islands/Edit', [
+            'island' => $island
         ]);
     }
 
@@ -45,12 +50,12 @@ class IslandController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'description' => 'nullable|string'
         ]);
 
         $island->update($validated);
 
-        return redirect()->route('islands.index')
+        return redirect()->route('dashboard.islands.index')
             ->with('success', 'Island updated successfully.');
     }
 
@@ -58,7 +63,7 @@ class IslandController extends Controller
     {
         $island->delete();
 
-        return redirect()->route('islands.index')
+        return redirect()->route('dashboard.islands.index')
             ->with('success', 'Island deleted successfully.');
     }
-} 
+}
