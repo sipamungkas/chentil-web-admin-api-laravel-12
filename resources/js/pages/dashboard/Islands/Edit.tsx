@@ -32,14 +32,14 @@ type FormData = {
 };
 
 export default function Edit({ island }: Props) {
-    const { data, setData, post, processing, errors, reset } = useForm<FormData>({
+    const { data, setData, put, processing, errors, reset } = useForm<FormData>({
         name: island.name,
         description: island.description || '',
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        post(route('islands.update', island.id), {
+        put(route('dashboard.islands.update', island.id), {
             onFinish: () => reset(),
         });
     };

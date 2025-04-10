@@ -24,9 +24,14 @@ export default function Create() {
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        post(route('islands.store'), {
-            onFinish: () => reset(),
-        });
+
+        post(
+            route('dashboard.islands.store'),
+
+            {
+                onFinish: () => reset(),
+            },
+        );
     };
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -57,13 +62,18 @@ export default function Create() {
                 <form onSubmit={submit} className="space-y-6">
                     <div className="space-y-2">
                         <Label htmlFor="name">Name</Label>
-                        <Input id="name" value={data.name} onChange={(e) => setData('name', e.target.value)} required />
+                        <Input name="name" id="name" value={data.name} onChange={(e) => setData('name', e.target.value)} required />
                         <InputError message={errors.name} />
                     </div>
 
                     <div className="space-y-2">
                         <Label htmlFor="description">Description</Label>
-                        <Textarea id="description" value={data.description} onChange={(e) => setData('description', e.target.value)} />
+                        <Textarea
+                            name="description"
+                            id="description"
+                            value={data.description}
+                            onChange={(e) => setData('description', e.target.value)}
+                        />
                         <InputError message={errors.description} />
                     </div>
 
