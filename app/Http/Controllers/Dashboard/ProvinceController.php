@@ -42,7 +42,7 @@ class ProvinceController extends Controller
         Province::create($validated);
 
         return redirect()
-            ->route('dashboard.provinces.index')
+            ->route('dashboard.provinces-menu.index')
             ->with('success', 'Province created successfully.');
     }
 
@@ -66,7 +66,7 @@ class ProvinceController extends Controller
         $province->update($validated);
 
         return redirect()
-            ->route('dashboard.provinces.index')
+            ->route('dashboard.provinces-menu.index')
             ->with('success', 'Province updated successfully.');
     }
 
@@ -75,7 +75,7 @@ class ProvinceController extends Controller
         $province->delete();
 
         return redirect()
-            ->route('dashboard.provinces.index')
+            ->route('dashboard.provinces-menu.index')
             ->with('success', 'Province deleted successfully.');
     }
 
