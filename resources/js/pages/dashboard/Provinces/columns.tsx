@@ -2,12 +2,7 @@ import { Link } from '@inertiajs/react';
 import { MoreHorizontal, Pencil, Trash } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 interface Island {
     id: number;
@@ -49,13 +44,13 @@ export const columns = [
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                     <DropdownMenuItem asChild>
-                        <Link href={route('dashboard.provinces.edit', row.id)}>
+                        <Link href={route('dashboard.provinces-menu.edit', row.id)}>
                             <Pencil className="mr-2 h-4 w-4" />
                             Edit
                         </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                        <Link href={route('dashboard.provinces.destroy', row.id)} method="delete" as="button">
+                        <Link href={route('dashboard.provinces-menu.destroy', row.id)} method="delete" as="button">
                             <Trash className="mr-2 h-4 w-4" />
                             Delete
                         </Link>
@@ -64,4 +59,4 @@ export const columns = [
             </DropdownMenu>
         ),
     },
-]; 
+];

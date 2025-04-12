@@ -2,11 +2,11 @@
 
 use App\Http\Controllers\Api\ProvinceController;
 use App\Http\Controllers\Dashboard\ContentController;
-use App\Http\Controllers\Dashboard\OverviewController;
-use App\Http\Controllers\Dashboard\RecommendationController;
 use App\Http\Controllers\Dashboard\EventController;
 use App\Http\Controllers\Dashboard\IslandController;
+use App\Http\Controllers\Dashboard\OverviewController;
 use App\Http\Controllers\Dashboard\ProvinceController as DashboardProvinceController;
+use App\Http\Controllers\Dashboard\RecommendationController;
 use App\Http\Middleware\AdminOnly;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -30,12 +30,12 @@ Route::middleware(['auth', 'verified', AdminOnly::class])->group(function () {
         Route::resource('islands', IslandController::class);
 
         // Standalone provinces
-        Route::get('provinces', [DashboardProvinceController::class, 'index'])->name('provinces.index');
-        Route::get('provinces/create', [DashboardProvinceController::class, 'create'])->name('provinces.create');
-        Route::post('provinces', [DashboardProvinceController::class, 'store'])->name('provinces.store');
-        Route::get('provinces/{province}/edit', [DashboardProvinceController::class, 'edit'])->name('provinces.edit');
-        Route::put('provinces/{province}', [DashboardProvinceController::class, 'update'])->name('provinces.update');
-        Route::delete('provinces/{province}', [DashboardProvinceController::class, 'destroy'])->name('provinces.destroy');
+        Route::get('provinces-menu', [DashboardProvinceController::class, 'index'])->name('provinces-menu.index');
+        Route::get('provinces-menu/create', [DashboardProvinceController::class, 'create'])->name('provinces-menu.create');
+        Route::post('provinces-menu', [DashboardProvinceController::class, 'store'])->name('provinces-menu.store');
+        Route::get('provinces-menu/{province}/edit', [DashboardProvinceController::class, 'edit'])->name('provinces-menu.edit');
+        Route::put('provinces-menu/{province}', [DashboardProvinceController::class, 'update'])->name('provinces-menu.update');
+        Route::delete('provinces-menu/{province}', [DashboardProvinceController::class, 'destroy'])->name('provinces-menu.destroy');
 
         // Island-specific provinces
         Route::get('islands/{island}/provinces', [DashboardProvinceController::class, 'islandIndex'])->name('islands.provinces.index');
@@ -87,7 +87,7 @@ Route::middleware(['auth', 'verified', AdminOnly::class])->group(function () {
         Route::delete('/recommendations/{recommendation}', [RecommendationController::class, 'destroy'])->name('recommendations.destroy');
 
         // location
-        Route::get('/provinces', [ProvinceController::class, 'index'])->name("province");
+        Route::get('/provinces', [ProvinceController::class, 'index'])->name('province');
         Route::get('/provinces/{province}/regencies', [ProvinceController::class, 'regencies'])->name('regency');
         Route::get('/regencies/{regency}/districts', [ProvinceController::class, 'districts'])->name('districts');
 

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
-
 use App\Models\Island;
 use App\Models\Province;
 use Illuminate\Http\Request;
@@ -13,13 +12,13 @@ use Inertia\Response;
 class ProvinceController extends Controller
 {
     // Standalone provinces
-    public function index(): Response
+    public function index()
     {
         $provinces = Province::with('island')
             ->latest()
             ->paginate(10);
 
-        return Inertia::render('Provinces/Index', [
+        return Inertia::render('dashboard/Provinces/Index', [
             'provinces' => $provinces
         ]);
     }
@@ -27,7 +26,7 @@ class ProvinceController extends Controller
     public function create(): Response
     {
         $islands = Island::all();
-        return Inertia::render('Provinces/Create', [
+        return Inertia::render('dashboard/Provinces/Create', [
             'islands' => $islands
         ]);
     }
@@ -42,14 +41,15 @@ class ProvinceController extends Controller
 
         Province::create($validated);
 
-        return redirect()->route('dashboard.provinces.index')
+        return redirect()
+            ->route('dashboard.provinces.index')
             ->with('success', 'Province created successfully.');
     }
 
     public function edit(Province $province): Response
     {
         $islands = Island::all();
-        return Inertia::render('Provinces/Edit', [
+        return Inertia::render('dashboard/Provinces/Edit', [
             'province' => $province,
             'islands' => $islands
         ]);
@@ -65,7 +65,8 @@ class ProvinceController extends Controller
 
         $province->update($validated);
 
-        return redirect()->route('dashboard.provinces.index')
+        return redirect()
+            ->route('dashboard.provinces.index')
             ->with('success', 'Province updated successfully.');
     }
 
@@ -73,19 +74,21 @@ class ProvinceController extends Controller
     {
         $province->delete();
 
-        return redirect()->route('dashboard.provinces.index')
+        return redirect()
+            ->route('dashboard.provinces.index')
             ->with('success', 'Province deleted successfully.');
     }
 
     // Island-specific provinces
     public function islandIndex(Island $island): Response
     {
-        $provinces = $island->provinces()
+        $provinces = $island
+            ->provinces()
             ->with('island')
             ->latest()
             ->paginate(10);
 
-        return Inertia::render('Provinces/Index', [
+        return Inertia::render('dashboard/Provinces/Index', [
             'island' => $island,
             'provinces' => $provinces
         ]);
@@ -94,7 +97,7 @@ class ProvinceController extends Controller
     public function islandCreate(Island $island): Response
     {
         $islands = Island::all();
-        return Inertia::render('Provinces/Create', [
+        return Inertia::render('dashboard/Provinces/Create', [
             'island' => $island,
             'islands' => $islands
         ]);
@@ -110,7 +113,8 @@ class ProvinceController extends Controller
 
         $island->provinces()->create($validated);
 
-        return redirect()->route('dashboard.islands.provinces.index', $island)
+        return redirect()
+            ->route('dashboard.islands.provinces.index', $island)
             ->with('success', 'Province created successfully.');
     }
 
@@ -134,7 +138,8 @@ class ProvinceController extends Controller
 
         $province->update($validated);
 
-        return redirect()->route('dashboard.islands.provinces.index', $island)
+        return redirect()
+            ->route('dashboard.islands.provinces.index', $island)
             ->with('success', 'Province updated successfully.');
     }
 
@@ -142,7 +147,8 @@ class ProvinceController extends Controller
     {
         $province->delete();
 
-        return redirect()->route('dashboard.islands.provinces.index', $island)
+        return redirect()
+            ->route('dashboard.islands.provinces.index', $island)
             ->with('success', 'Province deleted successfully.');
     }
-} 
+}

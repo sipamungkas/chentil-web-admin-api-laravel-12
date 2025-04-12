@@ -28,7 +28,7 @@ const contentNavItems: NavItem[] = [
     },
     {
         title: 'Provinces',
-        href: '/dashboard/provinces',
+        href: '/dashboard/provinces-menu',
         icon: Building2,
     },
     {
