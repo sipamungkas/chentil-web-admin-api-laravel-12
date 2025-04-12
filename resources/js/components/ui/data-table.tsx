@@ -10,12 +10,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-
-interface Column {
-    header: string;
-    accessorKey: string;
-    cell?: (row: any) => React.ReactNode;
-}
+import { Column } from '@/types';
 
 interface Pagination {
     currentPage: number;
@@ -26,14 +21,27 @@ interface Pagination {
     to: number;
 }
 
-interface DataTableProps {
-    columns: Column[];
-    data: any[];
+interface DataTableProps<T extends Record<string, unknown>> {
+    columns: Column<T>[];
+    data: T[];
     pagination: Pagination;
 }
 
-export function DataTable({ columns, data, pagination }: DataTableProps) {
+export function DataTable<T extends Record<string, unknown>>({ columns, data, pagination }: DataTableProps<T>) {
     const { currentPage, lastPage, from, to, total } = pagination;
+
+    const getCellContent = (row: T, column: Column<T>) => {
+        if (column.cell) {
+            return column.cell(row);
+        }
+        if (column.getValue) {
+            return column.getValue(row);
+        }
+        const value = column.accessorKey.split('.').reduce((obj: Record<string, unknown> | undefined, key: string) => {
+            return obj?.[key] as Record<string, unknown> | undefined;
+        }, row as Record<string, unknown>);
+        return String(value ?? '');
+    };
 
     return (
         <div className="space-y-4">
@@ -53,7 +61,7 @@ export function DataTable({ columns, data, pagination }: DataTableProps) {
                             <TableRow key={index}>
                                 {columns.map((column) => (
                                     <TableCell key={column.accessorKey}>
-                                        {column.cell ? column.cell(row) : row[column.accessorKey]}
+                                        {getCellContent(row, column)}
                                     </TableCell>
                                 ))}
                             </TableRow>

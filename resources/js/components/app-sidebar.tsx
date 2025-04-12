@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Calendar, Compass, Folder, LayoutGrid, Newspaper, Palmtree, Sparkles, UtensilsCrossed, Waves, Map, Building2 } from 'lucide-react';
+import { BookOpen, Calendar, Compass, Folder, LayoutGrid, Newspaper, Palmtree, Sparkles, UtensilsCrossed, Waves, Map, Building2, MapPin, Home, Building } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -20,7 +20,7 @@ const mainNavItems: NavItem[] = [
     },
 ];
 
-const contentNavItems: NavItem[] = [
+const locationNavItems: NavItem[] = [
     {
         title: 'Islands',
         href: '/dashboard/islands',
@@ -31,6 +31,24 @@ const contentNavItems: NavItem[] = [
         href: '/dashboard/provinces-menu',
         icon: Building2,
     },
+    {
+        title: 'Regencies',
+        href: '/dashboard/regencies',
+        icon: Building,
+    },
+    {
+        title: 'Districts',
+        href: '/dashboard/districts',
+        icon: MapPin,
+    },
+    {
+        title: 'Villages',
+        href: '/dashboard/villages',
+        icon: Home,
+    },
+];
+
+const contentNavItems: NavItem[] = [
     {
         title: 'Destinations',
         href: '/dashboard/destinations',
@@ -93,7 +111,8 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <NavMain items={mainNavItems} />
-                <NavMain items={contentNavItems} />
+                <NavMain title="Location Management" items={locationNavItems} />
+                <NavMain title="Content Management" items={contentNavItems} />
             </SidebarContent>
 
             <SidebarFooter>

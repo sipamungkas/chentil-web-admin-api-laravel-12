@@ -97,6 +97,11 @@ Route::middleware(['auth', 'verified', AdminOnly::class])->group(function () {
         Route::post('/events', [EventController::class, 'store'])->name('events.store');
         Route::put('/events/{event}', [EventController::class, 'update'])->name('events.update');
         Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('events.destroy');
+
+        // Location Management
+        Route::resource('districts', \App\Http\Controllers\Dashboard\DistrictController::class);
+        Route::resource('regencies', \App\Http\Controllers\Dashboard\RegencyController::class);
+        Route::resource('villages', \App\Http\Controllers\Dashboard\VillageController::class);
     });
 });
 
