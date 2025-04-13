@@ -20,10 +20,7 @@ class VillageController extends Controller
 
     public function create()
     {
-        $districts = District::with('regency.province')->get();
-        return Inertia::render('dashboard/Villages/Create', [
-            'districts' => $districts
-        ]);
+        return Inertia::render('dashboard/Villages/Create');
     }
 
     public function store(Request $request)
@@ -43,10 +40,8 @@ class VillageController extends Controller
 
     public function edit(Village $village)
     {
-        $districts = District::with('regency.province')->get();
         return Inertia::render('dashboard/Villages/Edit', [
             'village' => $village->load('district.regency.province'),
-            'districts' => $districts
         ]);
     }
 

@@ -20,10 +20,8 @@ class RegencyController extends Controller
 
     public function create()
     {
-        $provinces = Province::all();
-        return Inertia::render('dashboard/Regencies/Create', [
-            'provinces' => $provinces
-        ]);
+
+        return Inertia::render('dashboard/Regencies/Create');
     }
 
     public function store(Request $request)
