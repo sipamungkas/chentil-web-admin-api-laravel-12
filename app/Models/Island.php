@@ -10,6 +10,7 @@ class Island extends Model
     protected $fillable = [
         'name',
         'description',
+        'image',
     ];
 
     public function provinces(): HasMany

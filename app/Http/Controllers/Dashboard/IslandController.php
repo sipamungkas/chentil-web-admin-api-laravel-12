@@ -7,6 +7,7 @@ use App\Models\Island;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Facades\Storage;
 
 class IslandController extends Controller
 {
@@ -30,8 +31,14 @@ class IslandController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string'
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('islands', 'public');
+            $validated['image'] = $path;
+        }
 
         Island::create($validated);
 
@@ -50,8 +57,19 @@ class IslandController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string'
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
+
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($island->image) {
+                Storage::disk('public')->delete($island->image);
+            }
+            
+            $path = $request->file('image')->store('islands', 'public');
+            $validated['image'] = $path;
+        }
 
         $island->update($validated);
 
@@ -61,6 +79,11 @@ class IslandController extends Controller
 
     public function destroy(Island $island)
     {
+        // Delete image if exists
+        if ($island->image) {
+            Storage::disk('public')->delete($island->image);
+        }
+
         $island->delete();
 
         return redirect()->route('dashboard.islands.index')
