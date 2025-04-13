@@ -21,13 +21,13 @@ interface Pagination {
     to: number;
 }
 
-interface DataTableProps<T extends Record<string, unknown>> {
+interface DataTableProps<T> {
     columns: Column<T>[];
     data: T[];
     pagination: Pagination;
 }
 
-export function DataTable<T extends Record<string, unknown>>({ columns, data, pagination }: DataTableProps<T>) {
+export function DataTable<T>({ columns, data, pagination }: DataTableProps<T>) {
     const { currentPage, lastPage, from, to, total } = pagination;
 
     const getCellContent = (row: T, column: Column<T>) => {
@@ -37,9 +37,9 @@ export function DataTable<T extends Record<string, unknown>>({ columns, data, pa
         if (column.getValue) {
             return column.getValue(row);
         }
-        const value = column.accessorKey.split('.').reduce((obj: Record<string, unknown> | undefined, key: string) => {
-            return obj?.[key] as Record<string, unknown> | undefined;
-        }, row as Record<string, unknown>);
+        const value = column.accessorKey.split('.').reduce((obj: any, key: string) => {
+            return obj?.[key];
+        }, row);
         return String(value ?? '');
     };
 

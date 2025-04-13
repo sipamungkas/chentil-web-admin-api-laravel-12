@@ -7,14 +7,31 @@ use App\Models\Province;
 use App\Models\Regency;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class RegencyController extends Controller
 {
-    public function index()
+    public function index(Request $request): Response
     {
-        $regencies = Regency::with('province')->paginate(10);
+        $search = $request->input('search');
+
+        $regencies = Regency::with('province')
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%")
+                    ->orWhereHas('province', function ($query) use ($search) {
+                        $query->where('name', 'like', "%{$search}%");
+                    });
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
         return Inertia::render('dashboard/Regencies/Index', [
-            'regencies' => $regencies
+            'regencies' => $regencies,
+            'filters' => [
+                'search' => $search,
+            ],
         ]);
     }
 

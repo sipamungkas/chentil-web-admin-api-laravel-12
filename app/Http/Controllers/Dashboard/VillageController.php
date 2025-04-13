@@ -7,14 +7,37 @@ use App\Models\District;
 use App\Models\Village;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class VillageController extends Controller
 {
-    public function index()
+    public function index(Request $request): Response
     {
-        $villages = Village::with('district.regency.province')->paginate(10);
+        $search = $request->input('search');
+        
+        $villages = Village::with(['district.regency.province'])
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%")
+                    ->orWhereHas('district', function ($query) use ($search) {
+                        $query->where('name', 'like', "%{$search}%")
+                            ->orWhereHas('regency', function ($query) use ($search) {
+                                $query->where('name', 'like', "%{$search}%")
+                                    ->orWhereHas('province', function ($query) use ($search) {
+                                        $query->where('name', 'like', "%{$search}%");
+                                    });
+                            });
+                    });
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
         return Inertia::render('dashboard/Villages/Index', [
-            'villages' => $villages
+            'villages' => $villages,
+            'filters' => [
+                'search' => $search,
+            ],
         ]);
     }
 

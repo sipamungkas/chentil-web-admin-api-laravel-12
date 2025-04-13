@@ -7,14 +7,34 @@ use App\Models\District;
 use App\Models\Regency;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class DistrictController extends Controller
 {
-    public function index()
+    public function index(Request $request): Response
     {
-        $districts = District::with('regency.province')->paginate(10);
+        $search = $request->input('search');
+        
+        $districts = District::with(['regency.province'])
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%")
+                    ->orWhereHas('regency', function ($query) use ($search) {
+                        $query->where('name', 'like', "%{$search}%")
+                            ->orWhereHas('province', function ($query) use ($search) {
+                                $query->where('name', 'like', "%{$search}%");
+                            });
+                    });
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
         return Inertia::render('dashboard/Districts/Index', [
-            'districts' => $districts
+            'districts' => $districts,
+            'filters' => [
+                'search' => $search,
+            ],
         ]);
     }
 

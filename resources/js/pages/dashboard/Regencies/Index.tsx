@@ -1,9 +1,12 @@
-import { Head, Link } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
+import { Head, Link, router } from '@inertiajs/react';
+import { Plus, Search } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import debounce from 'lodash/debounce';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataTable } from '@/components/ui/data-table';
+import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Regency } from '@/types';
 import { columns } from './columns';
@@ -18,9 +21,33 @@ interface Props {
         from: number;
         to: number;
     };
+    filters: {
+        search: string;
+    };
 }
 
-export default function RegenciesIndex({ regencies }: Props) {
+export default function RegenciesIndex({ regencies, filters }: Props) {
+    const [search, setSearch] = useState(filters.search || '');
+
+    const debouncedSearch = useCallback(
+        debounce((value: string) => {
+            router.get(
+                '/dashboard/regencies',
+                { search: value },
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                },
+            );
+        }, 300),
+        [],
+    );
+
+    useEffect(() => {
+        debouncedSearch(search);
+        return () => debouncedSearch.cancel();
+    }, [search, debouncedSearch]);
+
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Dashboard',
@@ -54,6 +81,15 @@ export default function RegenciesIndex({ regencies }: Props) {
                     <CardHeader>
                         <CardTitle>Regencies List</CardTitle>
                         <CardDescription>A list of all regencies in the system</CardDescription>
+                        <div className="mt-4 flex w-full max-w-sm items-center space-x-2">
+                            <Search className="h-4 w-4 text-gray-500" />
+                            <Input
+                                placeholder="Search regencies..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="h-8"
+                            />
+                        </div>
                     </CardHeader>
                     <CardContent>
                         <DataTable

@@ -11,14 +11,24 @@ use Illuminate\Support\Facades\Storage;
 
 class IslandController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $search = $request->input('search');
+        
         $islands = Island::withCount('provinces')
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            })
             ->latest()
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('dashboard/Islands/Index', [
-            'islands' => $islands
+            'islands' => $islands,
+            'filters' => [
+                'search' => $search,
+            ],
         ]);
     }
 
