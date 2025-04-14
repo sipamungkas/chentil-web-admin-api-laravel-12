@@ -1,8 +1,8 @@
-import { MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Link, router } from '@inertiajs/react';
 import { Column } from '@/types';
+import { Link, router } from '@inertiajs/react';
+import { MoreHorizontal } from 'lucide-react';
 
 interface Island {
     id: number;
@@ -19,13 +19,9 @@ export const columns: Column<Island>[] = [
         cell: (row) => {
             const image = row.image;
             return image ? (
-                <img
-                    src={`/storage/${image}`}
-                    alt={row.name}
-                    className="h-10 w-10 rounded-full object-cover"
-                />
+                <img src={`/storage/${image}`} alt={row.name} className="aspect-video w-16 rounded-sm object-cover" />
             ) : (
-                <div className="h-10 w-10 rounded-full bg-gray-200" />
+                <div className="aspect-video w-16 rounded-sm bg-gray-200" />
             );
         },
     },
@@ -78,4 +74,4 @@ export const columns: Column<Island>[] = [
             );
         },
     },
-]; 
+];
