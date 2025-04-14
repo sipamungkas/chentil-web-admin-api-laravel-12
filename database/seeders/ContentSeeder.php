@@ -45,7 +45,7 @@ class ContentSeeder extends Seeder
                 'description' => 'Traditional Indonesian cultural performance and heritage.',
                 'image_prefix' => 'culture',
             ],
-            'food_and_beverage' => [
+            'fnb' => [
                 'titles' => [
                     'Nasi Goreng', 'Rendang', 'Sate Ayam', 'Gado-gado', 'Soto Ayam',
                     'Bakso', 'Mie Goreng', 'Nasi Uduk', 'Sop Buntut', 'Bebek Goreng',

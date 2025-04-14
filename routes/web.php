@@ -59,10 +59,10 @@ Route::middleware(['auth', 'verified', AdminOnly::class])->group(function () {
         Route::get('/cultures/{content}/edit', [ContentController::class, 'edit'])->name('cultures.edit');
 
         // Food & Beverages
-        Route::get('/food-and-beverages', [ContentController::class, 'foodAndBeverages'])->name('food-and-beverages.index');
-        Route::get('/food-and-beverages/create', [ContentController::class, 'create'])->defaults('category', 'food_and_beverage')->name('food-and-beverages.create');
-        Route::get('/food-and-beverages/{content}', [ContentController::class, 'show'])->name('food-and-beverages.show');
-        Route::get('/food-and-beverages/{content}/edit', [ContentController::class, 'edit'])->name('food-and-beverages.edit');
+        Route::get('/fnbs', [ContentController::class, 'foodAndBeverages'])->name('fnbs.index');
+        Route::get('/fnbs/create', [ContentController::class, 'create'])->defaults('category', 'fnb')->name('fnbs.create');
+        Route::get('/fnbs/{content}', [ContentController::class, 'show'])->name('fnbs.show');
+        Route::get('/fnbs/{content}/edit', [ContentController::class, 'edit'])->name('fnbs.edit');
 
         // Content CRUD
         Route::post('/contents', [ContentController::class, 'store'])->name('contents.store');

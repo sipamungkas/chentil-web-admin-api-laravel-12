@@ -39,7 +39,7 @@ class Content extends Model
     const CATEGORY_DESTINATION = 'destination';
     const CATEGORY_OUTBOUND = 'outbound';
     const CATEGORY_CULTURE = 'culture';
-    const CATEGORY_FOOD_AND_BEVERAGE = 'food_and_beverage';
+    const CATEGORY_FOOD_AND_BEVERAGE = 'fnb';
 
     public function province(): BelongsTo
     {

@@ -66,7 +66,7 @@ const contentNavItems: NavItem[] = [
     },
     {
         title: 'Food & Beverages',
-        href: '/dashboard/food-and-beverages',
+        href: '/dashboard/fnbs',
         icon: UtensilsCrossed,
     },
     {

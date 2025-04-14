@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('description');
-            $table->enum('category', ['destination', 'outbound', 'culture', 'food_and_beverage']);
+            $table->enum('category', ['destination', 'outbound', 'culture', 'fnb']);
             $table->foreignId('district_id')->nullable()->constrained()->nullOnDelete();
             $table->string('image')->nullable()->comment('Content image');
             $table->integer('since_century')->nullable()->comment('For culture category: which century it started');

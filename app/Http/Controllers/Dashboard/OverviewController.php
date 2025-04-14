@@ -24,7 +24,7 @@ class OverviewController extends Controller
         $outboundCount = Content::where('category', 'outbound')->count();
         $cultureCount = Content::where('category', 'culture')->count();
         $destinationCount = Content::where('category', 'destination')->count();
-        $foodAndBeverageCount = Content::where('category', 'food_and_beverate')->count();
+        $foodAndBeverageCount = Content::where('category', 'fnb')->count();
         $islandCount = Island::count();
         $provinceCount = Province::count();
         $regencyCount = Regency::count();
