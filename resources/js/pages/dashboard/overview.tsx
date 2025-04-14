@@ -22,17 +22,39 @@ interface DashboardStats {
     foodAndBeverageCount: number;
     destinationCount: number;
     cultureCount: number;
+    islandCount: number;
+    provinceCount: number;
+    regencyCount: number;
+    districtCount: number;
+    villageCount: number;
 }
 
-export default function Overview({ userCount, newsCount }: DashboardStats) {
+export default function Overview({
+    userCount,
+    newsCount,
+    outboundCount,
+    foodAndBeverageCount,
+    destinationCount,
+    cultureCount,
+    islandCount,
+    provinceCount,
+    regencyCount,
+    districtCount,
+    villageCount,
+}: DashboardStats) {
     // Dummy data for demonstration
     const stats: DashboardStats = {
-        userCount: userCount,
-        outboundCount: 56,
-        newsCount: newsCount,
-        foodAndBeverageCount: 45,
-        destinationCount: 78,
-        cultureCount: 34,
+        userCount,
+        outboundCount,
+        newsCount,
+        foodAndBeverageCount,
+        destinationCount,
+        cultureCount,
+        islandCount,
+        provinceCount,
+        regencyCount,
+        districtCount,
+        villageCount,
     };
 
     const statCards = [
