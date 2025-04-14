@@ -1,8 +1,9 @@
 // import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
+import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import { Landmark, MapPin, Newspaper, Plane, Users, UtensilsCrossed } from 'lucide-react';
+import { Building, Building2, Globe2, Home, Landmark, MapPin, MapPinned, Newspaper, Plane, Users, UtensilsCrossed } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -31,8 +32,8 @@ interface DashboardStats {
 
 export default function Overview({
     userCount,
-    newsCount,
     outboundCount,
+    newsCount,
     foodAndBeverageCount,
     destinationCount,
     cultureCount,
@@ -42,80 +43,97 @@ export default function Overview({
     districtCount,
     villageCount,
 }: DashboardStats) {
-    // Dummy data for demonstration
-    const stats: DashboardStats = {
-        userCount,
-        outboundCount,
-        newsCount,
-        foodAndBeverageCount,
-        destinationCount,
-        cultureCount,
-        islandCount,
-        provinceCount,
-        regencyCount,
-        districtCount,
-        villageCount,
-    };
-
-    const statCards = [
+    const cards = [
         {
             title: 'Total Users',
-            value: stats.userCount,
+            value: userCount,
             icon: Users,
             color: 'text-blue-500',
         },
         {
             title: 'Outbound Trips',
-            value: stats.outboundCount,
+            value: outboundCount,
             icon: Plane,
             color: 'text-green-500',
         },
         {
             title: 'News Articles',
-            value: stats.newsCount,
+            value: newsCount,
             icon: Newspaper,
             color: 'text-purple-500',
         },
         {
             title: 'Food & Beverage',
-            value: stats.foodAndBeverageCount,
+            value: foodAndBeverageCount,
             icon: UtensilsCrossed,
             color: 'text-orange-500',
         },
         {
             title: 'Destinations',
-            value: stats.destinationCount,
+            value: destinationCount,
             icon: MapPin,
             color: 'text-red-500',
         },
         {
             title: 'Cultures',
-            value: stats.cultureCount,
+            value: cultureCount,
             icon: Landmark,
             color: 'text-yellow-500',
+        },
+        // Location stats
+        {
+            title: 'Islands',
+            value: islandCount,
+            icon: Globe2,
+            color: 'text-cyan-500',
+        },
+        {
+            title: 'Provinces',
+            value: provinceCount,
+            icon: Building2,
+            color: 'text-indigo-500',
+        },
+        {
+            title: 'Regencies',
+            value: regencyCount,
+            icon: Building,
+            color: 'text-pink-500',
+        },
+        {
+            title: 'Districts',
+            value: districtCount,
+            icon: MapPinned,
+            color: 'text-emerald-500',
+        },
+        {
+            title: 'Villages',
+            value: villageCount,
+            icon: Home,
+            color: 'text-amber-500',
         },
     ];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard Overview" />
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="grid auto-rows-min gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {statCards.map((stat, index) => {
-                        const Icon = stat.icon;
-                        return (
-                            <div
-                                key={index}
-                                className="border-sidebar-border/70 dark:border-sidebar-border relative flex flex-col gap-2 rounded-xl border p-4"
-                            >
-                                <div className="flex items-center justify-between">
-                                    <h3 className="text-muted-foreground text-sm font-medium">{stat.title}</h3>
-                                    <Icon className={`size-5 ${stat.color}`} />
+            <div className="flex flex-col gap-4 p-4">
+                <div className="mb-6">
+                    <h1 className="text-2xl font-semibold">Overview</h1>
+                    <p className="text-muted-foreground text-sm">Dashboard overview and summary</p>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+                    {cards.map((card) => (
+                        <Card key={card.title}>
+                            <CardContent className="flex items-center gap-4 p-6">
+                                <card.icon className={`h-8 w-8 ${card.color}`} />
+                                <div>
+                                    <p className="text-muted-foreground text-sm font-medium">{card.title}</p>
+                                    <p className="text-2xl font-bold">{card.value}</p>
                                 </div>
-                                <div className="text-2xl font-bold">{stat.value}</div>
-                            </div>
-                        );
-                    })}
+                            </CardContent>
+                        </Card>
+                    ))}
                 </div>
                 {/* <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[400px] flex-1 overflow-hidden rounded-xl border">
                     <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
