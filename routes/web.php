@@ -30,7 +30,7 @@ Route::middleware(['auth', 'verified', AdminOnly::class])->group(function () {
         Route::resource('islands', IslandController::class);
         Route::get('islands/{island}/provinces', [IslandController::class, 'provinces'])->name('islands.provinces');
         Route::post('islands/{island}/provinces', [IslandController::class, 'addProvince'])->name('islands.provinces.add');
-        Route::delete('islands/{island}/provinces/{province}', [IslandController::class, 'removeProvince'])->name('islands.provinces.remove');
+        Route::post('islands/{island}/provinces/remove', [IslandController::class, 'removeProvince'])->name('islands.provinces.remove');
 
         // Standalone provinces
         Route::get('provinces-menu', [DashboardProvinceController::class, 'index'])->name('provinces-menu.index');

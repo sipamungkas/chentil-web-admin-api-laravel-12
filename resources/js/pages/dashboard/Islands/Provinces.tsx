@@ -68,13 +68,22 @@ export default function Provinces({ island, availableProvinces, filters }: Props
     };
 
     const handleRemoveProvince = (provinceId: number) => {
-        router.delete(`/dashboard/islands/${island.id}/provinces/${provinceId}`, {
-            preserveState: true,
-            preserveScroll: true,
-            onSuccess: () => {
-                toast.success('Province removed successfully');
+        router.post(
+            `/dashboard/islands/${island.id}/provinces/remove`,
+            {
+                province_id: provinceId,
             },
-        });
+            {
+                preserveState: true,
+                preserveScroll: true,
+                onSuccess: () => {
+                    toast.success('Province removed successfully');
+                },
+                onError: (errors) => {
+                    toast.error(errors.message || 'Failed to remove province');
+                },
+            },
+        );
     };
 
     return (
