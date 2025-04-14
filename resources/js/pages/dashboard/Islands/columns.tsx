@@ -63,6 +63,13 @@ export const columns: Column<Island>[] = [
                         <DropdownMenuItem asChild>
                             <Link href={`/dashboard/islands/${row.id}/edit`}>Edit</Link>
                         </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={() => {
+                                router.get(`/dashboard/islands/${row.id}/provinces`);
+                            }}
+                        >
+                            Manage Provinces
+                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={handleDelete} className="text-red-600">
                             Delete
                         </DropdownMenuItem>

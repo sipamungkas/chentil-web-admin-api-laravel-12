@@ -28,6 +28,9 @@ Route::middleware(['auth', 'verified', AdminOnly::class])->group(function () {
 
         // Islands and Provinces
         Route::resource('islands', IslandController::class);
+        Route::get('islands/{island}/provinces', [IslandController::class, 'provinces'])->name('islands.provinces');
+        Route::post('islands/{island}/provinces', [IslandController::class, 'addProvince'])->name('islands.provinces.add');
+        Route::delete('islands/{island}/provinces/{province}', [IslandController::class, 'removeProvince'])->name('islands.provinces.remove');
 
         // Standalone provinces
         Route::get('provinces-menu', [DashboardProvinceController::class, 'index'])->name('provinces-menu.index');
@@ -36,14 +39,6 @@ Route::middleware(['auth', 'verified', AdminOnly::class])->group(function () {
         Route::get('provinces-menu/{province}/edit', [DashboardProvinceController::class, 'edit'])->name('provinces-menu.edit');
         Route::put('provinces-menu/{province}', [DashboardProvinceController::class, 'update'])->name('provinces-menu.update');
         Route::delete('provinces-menu/{province}', [DashboardProvinceController::class, 'destroy'])->name('provinces-menu.destroy');
-
-        // Island-specific provinces
-        Route::get('islands/{island}/provinces', [DashboardProvinceController::class, 'islandIndex'])->name('islands.provinces.index');
-        Route::get('islands/{island}/provinces/create', [DashboardProvinceController::class, 'islandCreate'])->name('islands.provinces.create');
-        Route::post('islands/{island}/provinces', [DashboardProvinceController::class, 'islandStore'])->name('islands.provinces.store');
-        Route::get('islands/{island}/provinces/{province}/edit', [DashboardProvinceController::class, 'islandEdit'])->name('islands.provinces.edit');
-        Route::put('islands/{island}/provinces/{province}', [DashboardProvinceController::class, 'islandUpdate'])->name('islands.provinces.update');
-        Route::delete('islands/{island}/provinces/{province}', [DashboardProvinceController::class, 'islandDestroy'])->name('islands.provinces.destroy');
 
         // Destinations
         Route::get('/destinations', [ContentController::class, 'destinations'])->name('destinations.index');

@@ -13,6 +13,8 @@ class Island extends Model
         'image',
     ];
 
+    protected $withCount = ['provinces'];
+
     public function provinces(): HasMany
     {
         return $this->hasMany(Province::class);

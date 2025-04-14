@@ -1,7 +1,9 @@
-import { Head, Link, router } from '@inertiajs/react';
+import type { PageProps as InertiaPageProps } from '@inertiajs/core';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import debounce from 'lodash/debounce';
 import { Plus, Search } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
-import debounce from 'lodash/debounce';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +12,12 @@ import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { columns } from './columns';
+
+interface Province {
+    id: number;
+    name: string;
+    code: string;
+}
 
 interface Props {
     islands: {
@@ -30,16 +38,41 @@ interface Props {
     filters: {
         search: string;
     };
+    island?: {
+        id: number;
+        name: string;
+        provinces: Province[];
+    };
+    availableProvinces?: Province[];
 }
 
+type PageProps = InertiaPageProps & {
+    flash: {
+        success?: string;
+        error?: string;
+    };
+};
+
 export default function Index({ islands, filters }: Props) {
+    const { flash } = usePage<PageProps>().props;
     const [search, setSearch] = useState(filters.search || '');
+
+    useEffect(() => {
+        if (flash?.success) {
+            toast.success(flash.success);
+        }
+        if (flash?.error) {
+            toast.error(flash.error);
+        }
+    }, [flash]);
 
     const debouncedSearch = useCallback(
         debounce((value: string) => {
             router.get(
                 '/dashboard/islands',
-                { search: value },
+                {
+                    search: value,
+                },
                 {
                     preserveState: true,
                     preserveScroll: true,
@@ -48,6 +81,11 @@ export default function Index({ islands, filters }: Props) {
         }, 300),
         [],
     );
+
+    const handleSearch = (value: string) => {
+        setSearch(value);
+        debouncedSearch(value);
+    };
 
     useEffect(() => {
         debouncedSearch(search);
@@ -89,12 +127,7 @@ export default function Index({ islands, filters }: Props) {
                         <CardDescription>A list of all islands in the system</CardDescription>
                         <div className="mt-4 flex w-full max-w-sm items-center space-x-2">
                             <Search className="h-4 w-4 text-gray-500" />
-                            <Input
-                                placeholder="Search islands..."
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                className="h-8"
-                            />
+                            <Input placeholder="Search islands..." value={search} onChange={(e) => handleSearch(e.target.value)} className="h-8" />
                         </div>
                     </CardHeader>
                     <CardContent>

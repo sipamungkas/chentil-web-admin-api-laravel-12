@@ -1,6 +1,6 @@
 import { SidebarProvider } from '@/components/ui/sidebar';
-import { Toaster } from '@/components/ui/toaster';
 import { useState } from 'react';
+import { Toaster } from 'sonner';
 
 interface AppShellProps {
     children: React.ReactNode;
