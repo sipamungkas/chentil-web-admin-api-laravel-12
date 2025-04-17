@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\NewsController;
+use App\Http\Controllers\Api\ContentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,19 +22,28 @@ use App\Http\Controllers\Api\NewsController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+// News routes
+Route::get('/news', [NewsController::class, 'index']);
+Route::get('/news/{news}', [NewsController::class, 'show']);
 
+// Island routes
+Route::get('/islands', [IslandController::class, 'index']);
+
+// Content routes
+Route::get('/destinations', [ContentController::class, 'destinations']);
+Route::get('/outbounds', [ContentController::class, 'outbounds']);
+Route::get('/cultures', [ContentController::class, 'cultures']);
+Route::get('/food-and-beverages', [ContentController::class, 'foodAndBeverages']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [AuthController::class, 'profile']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    // News routes
-    Route::get('/news', [NewsController::class, 'index']);
-    Route::get('/news/{news}', [NewsController::class, 'show']);
-    // Route::post('/news', [NewsController::class, 'store']);
-    // Route::put('/news/{news}', [NewsController::class, 'update']);
-    // Route::delete('/news/{news}', [NewsController::class, 'destroy']);
+    // Protected news routes
+    Route::post('/news', [NewsController::class, 'store']);
+    Route::put('/news/{news}', [NewsController::class, 'update']);
+    Route::delete('/news/{news}', [NewsController::class, 'destroy']);
 
     // Island routes
     Route::get('/islands', [IslandController::class, 'index']);
