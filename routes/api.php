@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\api\IslandController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
@@ -33,4 +34,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Route::post('/news', [NewsController::class, 'store']);
     // Route::put('/news/{news}', [NewsController::class, 'update']);
     // Route::delete('/news/{news}', [NewsController::class, 'destroy']);
+
+    // Island routes
+    Route::get('/islands', [IslandController::class, 'index']);
 });
