@@ -20,12 +20,20 @@ class ContentController extends Controller
     {
         Log::info('API: Fetching destinations', [
             'category' => Content::CATEGORY_DESTINATION,
+            'island_id' => $request->input('island_id'),
         ]);
 
         $perPage = $request->input('per_page', 10);
-        $contents = Content::destination()
-            ->with(['district', 'province', 'regency'])
-            ->visible()
+        $query = Content::destination()
+            ->with(['district', 'province.island', 'regency']);
+
+        if ($request->has('island_id')) {
+            $query->whereHas('province', function ($query) use ($request) {
+                $query->where('island_id', $request->input('island_id'));
+            });
+        }
+
+        $contents = $query
             ->orderBy('order')
             ->paginate($perPage);
 
@@ -47,12 +55,20 @@ class ContentController extends Controller
     {
         Log::info('API: Fetching outbounds', [
             'category' => Content::CATEGORY_OUTBOUND,
+            'island_id' => $request->input('island_id'),
         ]);
 
         $perPage = $request->input('per_page', 10);
-        $contents = Content::outbound()
-            ->with(['district', 'province', 'regency'])
-            ->visible()
+        $query = Content::outbound()
+            ->with(['district', 'province.island', 'regency']);
+
+        if ($request->has('island_id')) {
+            $query->whereHas('province', function ($query) use ($request) {
+                $query->where('island_id', $request->input('island_id'));
+            });
+        }
+
+        $contents = $query
             ->orderBy('order')
             ->paginate($perPage);
 
@@ -74,12 +90,20 @@ class ContentController extends Controller
     {
         Log::info('API: Fetching cultures', [
             'category' => Content::CATEGORY_CULTURE,
+            'island_id' => $request->input('island_id'),
         ]);
 
         $perPage = $request->input('per_page', 10);
-        $contents = Content::culture()
-            ->with(['district', 'province', 'regency'])
-            ->visible()
+        $query = Content::culture()
+            ->with(['district', 'province.island', 'regency']);
+
+        if ($request->has('island_id')) {
+            $query->whereHas('province', function ($query) use ($request) {
+                $query->where('island_id', $request->input('island_id'));
+            });
+        }
+
+        $contents = $query
             ->orderBy('order')
             ->paginate($perPage);
 
@@ -101,12 +125,20 @@ class ContentController extends Controller
     {
         Log::info('API: Fetching food and beverages', [
             'category' => Content::CATEGORY_FOOD_AND_BEVERAGE,
+            'island_id' => $request->input('island_id'),
         ]);
 
         $perPage = $request->input('per_page', 10);
-        $contents = Content::foodAndBeverage()
-            ->with(['district', 'province', 'regency'])
-            ->visible()
+        $query = Content::foodAndBeverage()
+            ->with(['district', 'province.island', 'regency']);
+
+        if ($request->has('island_id')) {
+            $query->whereHas('province', function ($query) use ($request) {
+                $query->where('island_id', $request->input('island_id'));
+            });
+        }
+
+        $contents = $query
             ->orderBy('order')
             ->paginate($perPage);
 
