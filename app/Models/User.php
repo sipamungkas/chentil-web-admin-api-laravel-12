@@ -70,4 +70,13 @@ class User extends Authenticatable
         return $this->belongsToMany(Content::class, 'favorites')
             ->withTimestamps();
     }
+
+    /**
+     * Get the contents that the user has wishlisted.
+     */
+    public function wishlists()
+    {
+        return $this->belongsToMany(Content::class, 'wishlists')
+            ->withTimestamps();
+    }
 }

@@ -75,6 +75,15 @@ class Content extends Model
             ->withTimestamps();
     }
 
+    /**
+     * Get the users that have wishlisted this content.
+     */
+    public function wishlistedBy()
+    {
+        return $this->belongsToMany(User::class, 'wishlists')
+            ->withTimestamps();
+    }
+
     // Scope for each category
     public function scopeDestination($query)
     {
