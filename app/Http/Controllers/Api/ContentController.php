@@ -7,6 +7,7 @@ use App\Http\Resources\ContentCollection;
 use App\Models\Content;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class ContentController extends Controller
 {
@@ -148,5 +149,64 @@ class ContentController extends Controller
         ]);
 
         return new ContentCollection($contents);
+    }
+
+    /**
+     * Get top 5 most favorited content.
+     *
+     * @param Request $request
+     * @return ContentCollection
+     */
+    public function topFavorites(Request $request)
+    {
+        Log::info('API: Fetching top favorited content');
+
+        $category = $request->input('category');
+        $query = Content::withCount('favoritedBy')
+            ->with(['district', 'province.island', 'regency'])
+            ->having('favorited_by_count', '>', 0);
+
+        // Filter by category if provided
+        if ($category) {
+            $query->where('category', $category);
+        }
+
+        $contents = $query->orderByDesc('favorited_by_count')
+            ->limit(5)
+            ->get();
+
+        Log::info('API: Found top favorited content', [
+            'count' => $contents->count(),
+            'category' => $category,
+        ]);
+
+        return new ContentCollection($contents);
+    }
+
+    /**
+     * Get top 5 most favorited content by category.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function topFavoritesByCategory(Request $request)
+    {
+        Log::info('API: Fetching top favorited content by category');
+
+        $contents = Content::withCount('favoritedBy')
+            ->with(['district', 'province.island', 'regency'])
+            ->having('favorited_by_count', '>', 0)
+            ->orderByDesc('favorited_by_count')
+            ->limit(5)
+            ->get();
+
+        Log::info('API: Found top favorited content by category', [
+            'topPicks' => $contents
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $contents
+        ]);
     }
 }
