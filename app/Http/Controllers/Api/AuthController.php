@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -102,15 +103,31 @@ class AuthController extends Controller
     public function profile(Request $request)
     {
         $user = $request->user();
-
         unset($user->role);
+        return (new UserResource($user))->response();
+    }
 
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'user' => $request->user()
-            ]
+    /**
+     * Update authenticated user profile
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+        $data = $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'email' => 'sometimes|required|email|unique:users,email,' . $user->id,
+            'password' => 'sometimes|nullable|min:8|confirmed',
         ]);
+        if (isset($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        } else {
+            unset($data['password']);
+        }
+        $user->update($data);
+        return (new UserResource($user))->response();
     }
 
     /**
