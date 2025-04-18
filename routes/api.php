@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\ContentController;
+use App\Http\Controllers\Api\FavoriteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,4 +52,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Recommendations routes
     Route::get('/recommendations', [RecommendationController::class, 'index']);
+
+    // Favorite routes
+    Route::get('/favorites', [FavoriteController::class, 'index']);
+    Route::post('/favorites/{content}', [FavoriteController::class, 'toggle']);
+    Route::get('/favorites/{content}/check', [FavoriteController::class, 'check']);
 });

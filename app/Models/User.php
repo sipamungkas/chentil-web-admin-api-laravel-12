@@ -40,14 +40,11 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'role' => 'string',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'role' => 'string',
+    ];
 
     /**
      * Check if the user is an admin
@@ -63,5 +60,14 @@ class User extends Authenticatable
     public function isUser(): bool
     {
         return $this->role === 'user';
+    }
+
+    /**
+     * Get the contents that the user has favorited.
+     */
+    public function favorites()
+    {
+        return $this->belongsToMany(Content::class, 'favorites')
+            ->withTimestamps();
     }
 }

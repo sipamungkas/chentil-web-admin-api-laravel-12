@@ -66,6 +66,15 @@ class Content extends Model
             ->orderByPivot('order', 'asc');
     }
 
+    /**
+     * Get the users that have favorited this content.
+     */
+    public function favoritedBy()
+    {
+        return $this->belongsToMany(User::class, 'favorites')
+            ->withTimestamps();
+    }
+
     // Scope for each category
     public function scopeDestination($query)
     {
