@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\ContentController;
 use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\WishlistController;
+use App\Http\Controllers\TripController;
 
 /*
 |--------------------------------------------------------------------------
@@ -65,4 +66,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/wishlists/food-and-beverages', [WishlistController::class, 'foodAndBeverages']);
     Route::post('/wishlists/{content}', [WishlistController::class, 'toggle']);
     Route::get('/wishlists/{content}/check', [WishlistController::class, 'check']);
+
+    // Trip routes
+    Route::get('/trips', [TripController::class, 'index']);
+    Route::post('/trips', [TripController::class, 'store']);
+    Route::get('/trips/{trip}', [TripController::class, 'show']);
+    Route::put('/trips/{trip}', [TripController::class, 'update']);
+    Route::delete('/trips/{trip}', [TripController::class, 'destroy']);
+    Route::post('/trips/{trip}/contents', [TripController::class, 'addContent']);
+    Route::delete('/trips/{trip}/contents/{content}', [TripController::class, 'removeContent']);
 });
