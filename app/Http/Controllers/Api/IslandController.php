@@ -18,9 +18,9 @@ class IslandController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->input('per_page', 10);
-        $news = Island::orderBy('name', 'asc')
+        $islands = Island::orderBy('name', 'asc')
             ->paginate($perPage);
 
-        return new IslandCollection($news);
+        return new IslandCollection($islands);
     }
 }
