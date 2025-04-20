@@ -127,6 +127,7 @@ class ContentController extends Controller
         Log::info('API: Fetching food and beverages', [
             'category' => Content::CATEGORY_FOOD_AND_BEVERAGE,
             'island_id' => $request->input('island_id'),
+            'province_id' => $request->input('province_id'),
         ]);
 
         $perPage = $request->input('per_page', 10);
@@ -137,6 +138,11 @@ class ContentController extends Controller
             $query->whereHas('province', function ($query) use ($request) {
                 $query->where('island_id', $request->input('island_id'));
             });
+        }
+
+        // Support filtering by a single province_id
+        if ($request->filled('province_id')) {
+            $query->where('province_id', $request->input('province_id'));
         }
 
         $contents = $query
