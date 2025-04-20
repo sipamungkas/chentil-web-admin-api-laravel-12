@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\api\IslandController;
+use App\Http\Controllers\Api\ProvinceController;
 use App\Http\Controllers\Api\RecommendationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
@@ -76,4 +77,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/trips/{trip}', [TripController::class, 'destroy']);
     Route::post('/trips/{trip}/contents', [TripController::class, 'addContent']);
     Route::delete('/trips/{trip}/contents/{content}', [TripController::class, 'removeContent']);
+
+    Route::get('/provinces', [ProvinceController::class, 'index']);
 });
