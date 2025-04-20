@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Helpers\S3Helper;
 
 class TripResource extends JsonResource
 {
@@ -21,15 +22,7 @@ class TripResource extends JsonResource
             'user_id' => $this->user_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            // 'contents' => $this->whenLoaded('contents', function () {
-            //     return $this->contents->map(function ($content) {
-            //         return [
-            //             'id' => $content->id,
-            //             'title' => $content->title ?? null,
-            //             'category' => $content->category ?? null,
-            //         ];
-            //     });
-            // }),
+            'image' => S3Helper::getS3ImageUrl($this->image ?? null),
             'contents' => new ContentCollection($this->whenLoaded('contents')),
         ];
     }

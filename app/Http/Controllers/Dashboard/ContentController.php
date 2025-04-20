@@ -7,6 +7,7 @@ use App\Models\Content;
 use App\Models\District;
 use App\Models\Province;
 use App\Models\Regency;
+use App\Helpers\S3Helper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -120,10 +121,6 @@ class ContentController extends Controller
 
     public function store(Request $request)
     {
-        Log::info('Storing content', [
-            'category' => $request->category,
-        ]);
-
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -143,11 +140,11 @@ class ContentController extends Controller
             'longitude' => 'nullable|numeric|between:-180,180',
             'order' => 'nullable|integer|min:0',
         ]);
-
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('content-images', 'public');
+            $file = $request->file('image');
+            $path = $file->storePublicly('content-images', 's3');
+            $validated['image'] = $path;
         }
-
         $content = Content::create($validated);
 
         Log::info('Content created', [
@@ -207,15 +204,15 @@ class ContentController extends Controller
             'longitude' => 'nullable|numeric|between:-180,180',
             'order' => 'nullable|integer|min:0',
         ]);
-
         if ($request->hasFile('image')) {
-            // Delete old image if exists
+            // Delete old image from S3 if it exists
             if ($content->image) {
-                Storage::disk('public')->delete($content->image);
+                Storage::disk('s3')->delete($content->image);
             }
-            $validated['image'] = $request->file('image')->store('content-images', 'public');
+            $file = $request->file('image');
+            $path = $file->storePublicly('content-images', 's3');
+            $validated['image'] = $path;
         }
-
         $content->update($validated);
 
         Log::info('Content updated', [
@@ -237,7 +234,7 @@ class ContentController extends Controller
         $category = $content->category;
 
         if ($content->image) {
-            Storage::disk('public')->delete($content->image);
+            Storage::disk('s3')->delete($content->image);
         }
 
         $content->delete();

@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use App\Helpers\S3Helper;
 
 class ContentCollection extends ResourceCollection
 {
@@ -14,6 +15,10 @@ class ContentCollection extends ResourceCollection
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return $this->collection->map(function ($item) {
+            $data = $item->toArray();
+            $data['image'] = S3Helper::getS3ImageUrl($data['image'] ?? null);
+            return $data;
+        })->all();
     }
 }

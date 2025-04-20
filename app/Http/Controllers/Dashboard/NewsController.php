@@ -54,7 +54,7 @@ class NewsController extends Controller
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $path = $file->store('news-images', 's3');
+            $path = $file->storePublicly('news-images', 's3');
             $validated['image'] = $path;
         }
 
@@ -107,7 +107,7 @@ class NewsController extends Controller
                 Storage::disk('s3')->delete($news->image);
             }
             $file = $request->file('image');
-            $path = $file->store('news-images', 's3');
+            $path = $file->storePublicly('news-images', 's3');
             $validated['image'] = $path;
         }
 

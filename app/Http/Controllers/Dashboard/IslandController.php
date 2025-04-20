@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\S3Helper;
 use App\Models\Island;
 use App\Models\Province;
 use Illuminate\Http\Request;
@@ -45,12 +46,11 @@ class IslandController extends Controller
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
-
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('islands', 'public');
+            $file = $request->file('image');
+            $path = $file->storePublicly('islands', 's3');
             $validated['image'] = $path;
         }
-
         Island::create($validated);
 
         return redirect()->route('dashboard.islands.index')
@@ -71,17 +71,15 @@ class IslandController extends Controller
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
-
         if ($request->hasFile('image')) {
-            // Delete old image if exists
+            // Delete old image from S3 if it exists
             if ($island->image) {
-                Storage::disk('public')->delete($island->image);
+                Storage::disk('s3')->delete($island->image);
             }
-            
-            $path = $request->file('image')->store('islands', 'public');
+            $file = $request->file('image');
+            $path = $file->storePublicly('islands', 's3');
             $validated['image'] = $path;
         }
-
         $island->update($validated);
 
         return redirect()->route('dashboard.islands.index')
@@ -92,7 +90,7 @@ class IslandController extends Controller
     {
         // Delete image if exists
         if ($island->image) {
-            Storage::disk('public')->delete($island->image);
+            Storage::disk('s3')->delete($island->image);
         }
 
         $island->delete();

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\NewsCollection;
+use App\Helpers\S3Helper;
 use App\Models\News;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -38,7 +39,6 @@ class NewsController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            // Accept image as file upload
             'image' => 'nullable|file|image|max:5120', // 5MB max
             'is_visible' => 'boolean',
             'order' => 'integer',
@@ -57,10 +57,8 @@ class NewsController extends Controller
         // Handle image upload to S3
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $path = $file->store('news-images', 's3');
-            // Optionally make the file public and get the URL
-            $url = Storage::disk('s3')->url($path);
-            $data['image'] = $url;
+            $path = $file->storePublicly('news-images', 's3');
+            $data['image'] = $path;
         }
 
         $news = News::create($data);
@@ -98,7 +96,7 @@ class NewsController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'string|max:255',
             'description' => 'string',
-            'image' => 'nullable|string|max:255',
+            'image' => 'nullable|file|image|max:5120',
             'is_visible' => 'boolean',
             'order' => 'integer',
         ]);
@@ -111,7 +109,19 @@ class NewsController extends Controller
             ], 422);
         }
 
-        $news->update($request->all());
+        $data = $request->all();
+
+        if ($request->hasFile('image')) {
+            // Delete old image from S3 if it exists
+            if ($news->image) {
+                Storage::disk('s3')->delete($news->image);
+            }
+            $file = $request->file('image');
+            $path = $file->storePublicly('news-images', 's3');
+            $data['image'] = $path;
+        }
+
+        $news->update($data);
 
         return response()->json([
             'status' => 'success',
