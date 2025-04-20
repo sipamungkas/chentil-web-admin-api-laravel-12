@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\NewsCollection;
 use App\Models\News;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class NewsController extends Controller
@@ -37,7 +38,8 @@ class NewsController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'image' => 'nullable|string|max:255',
+            // Accept image as file upload
+            'image' => 'nullable|file|image|max:5120', // 5MB max
             'is_visible' => 'boolean',
             'order' => 'integer',
         ]);
@@ -50,7 +52,18 @@ class NewsController extends Controller
             ], 422);
         }
 
-        $news = News::create($request->all());
+        $data = $request->all();
+
+        // Handle image upload to S3
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $path = $file->store('news-images', 's3');
+            // Optionally make the file public and get the URL
+            $url = Storage::disk('s3')->url($path);
+            $data['image'] = $url;
+        }
+
+        $news = News::create($data);
 
         return response()->json([
             'status' => 'success',

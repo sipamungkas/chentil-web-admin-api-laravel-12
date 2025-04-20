@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use App\Helpers\S3Helper;
 use App\Http\Controllers\Controller;
 use App\Models\News;
-use File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -17,9 +17,15 @@ class NewsController extends Controller
      */
     public function index(): Response
     {
+        $news = News::orderBy('order')->paginate(10);
+        // Add full S3 image URLs to each news item
+        $news->getCollection()->transform(function ($item) {
+            $item->image = S3Helper::getS3ImageUrl($item->image ?? null);
+            return $item;
+        });
         return Inertia::render('dashboard/news/index', [
             'title' => 'News Management',
-            'news' => News::orderBy('order')->paginate(10),
+            'news' => $news,
         ]);
     }
 
@@ -46,12 +52,10 @@ class NewsController extends Controller
             'order' => 'integer',
         ]);
 
-        // dd($request->file('image'));
-
         if ($request->hasFile('image')) {
-            $fileName = time() . '.' . $request->file('image')->extension();
-            $request->file('image')->move(public_path('images'), $fileName);
-            $validated['image'] = "/images/$fileName";
+            $file = $request->file('image');
+            $path = $file->store('news-images', 's3');
+            $validated['image'] = $path;
         }
 
         News::create($validated);
@@ -65,6 +69,7 @@ class NewsController extends Controller
      */
     public function show(News $news): Response
     {
+        $news->image = S3Helper::getS3ImageUrl($news->image ?? null);
         return Inertia::render('dashboard/news/Show', [
             'title' => 'View News',
             'news' => $news,
@@ -76,6 +81,7 @@ class NewsController extends Controller
      */
     public function edit(News $news): Response
     {
+        $news->image = S3Helper::getS3ImageUrl($news->image ?? null);
         return Inertia::render('dashboard/news/Edit', [
             'title' => 'Edit News',
             'news' => $news,
@@ -96,16 +102,13 @@ class NewsController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            // Delete old image if exists
+            // Delete old image from S3 if it exists and is an S3 URL
             if ($news->image) {
-                $isExist = File::exists(public_path('') . $news->image);
-                if ($isExist) {
-                    unlink(public_path('') . $news->image);
-                }
+                Storage::disk('s3')->delete($news->image);
             }
-            $fileName = time() . '.' . $request->file('image')->extension();
-            $request->file('image')->move(public_path('images'), $fileName);
-            $validated['image'] = "/images/$fileName";
+            $file = $request->file('image');
+            $path = $file->store('news-images', 's3');
+            $validated['image'] = $path;
         }
 
         $news->update($validated);
@@ -119,12 +122,9 @@ class NewsController extends Controller
      */
     public function destroy(News $news)
     {
-        // dd('tes', Storage::disk('public') . '.' . $news->image);
+        // Optionally, delete image from S3 if needed
         if ($news->image) {
-            $isExist = File::exists(public_path('') . $news->image);
-            if ($isExist) {
-                unlink(public_path('') . $news->image);
-            }
+            Storage::disk('s3')->delete($news->image);
         }
 
         $news->delete();

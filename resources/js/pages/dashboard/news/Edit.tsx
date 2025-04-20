@@ -156,7 +156,7 @@ export default function Edit({ title, news }: Props) {
                                         {previewUrl ? (
                                             <img src={previewUrl} alt="Preview" className="h-full w-full object-cover" />
                                         ) : news.image ? (
-                                            <img src={`/storage/${news.image}`} alt={news.title} className="h-full w-full object-cover" />
+                                            <img src={news.image} alt={news.title} className="h-full w-full object-cover" />
                                         ) : (
                                             <div className="flex h-full flex-col items-center justify-center gap-2 text-gray-500">
                                                 <ImageIcon className="h-8 w-8" />
