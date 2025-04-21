@@ -59,16 +59,16 @@ jobs:
           AWS_USE_PATH_STYLE_ENDPOINT: ${{ secrets.AWS_USE_PATH_STYLE_ENDPOINT }}
           VITE_APP_NAME: ${{ secrets.VITE_APP_NAME }}
         run: |
-          cp .env.example .env
-          while IFS='=' read -r key _; do
-            if [[ ! "$key" =~ ^# && -n "$key" ]]; then
-              value="$(echo "${!key}" | xargs)" # Trim whitespace
-              if [ -n "$value" ]; then
-                esc_value=$(printf '%s\n' "$value" | sed -e 's/[\\/&]/\\\\&/g')
-                sed -i "s|^$key=.*|$key=$esc_value|" .env
-              fi
+          awk -F= 'NF && $1 !~ /^#/ {print $1}' .env.example | while read key; do
+            value="$(echo "${!key}" | xargs)" # Trim whitespace
+            if [ -n "$value" ]; then
+              esc_value=$(printf '%s\n' "$value" | sed -e 's/[\\/&]/\\\\&/g')
+              echo "$key=$esc_value" >> .env.tmp
+            else
+              grep -E "^$key=" .env.example >> .env.tmp || true
             fi
-          done < .env.example
+          done
+          mv .env.tmp .env
           # Remove lines with only whitespace
           sed -i '/^[[:space:]]*$/d' .env
 
