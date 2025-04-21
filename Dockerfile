@@ -1,4 +1,6 @@
 # Dockerfile for Laravel app
+FROM php:8.2-fpm
+
 # Add ARG and ENV for all environment variables needed by Laravel and the build
 ARG APP_NAME
 ARG APP_ENV
@@ -73,8 +75,6 @@ ENV AWS_ENDPOINT=${AWS_ENDPOINT}
 ENV AWS_URL=${AWS_URL}
 ENV AWS_USE_PATH_STYLE_ENDPOINT=${AWS_USE_PATH_STYLE_ENDPOINT}
 ENV VITE_APP_NAME=${VITE_APP_NAME}
-
-FROM php:8.2-fpm
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
