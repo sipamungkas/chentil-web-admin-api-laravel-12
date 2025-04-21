@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    container_name: laravel_app
+    volumes:
+      - .:/var/www
+    environment:
+      - APP_ENV=production
+    expose:
+      - 9000
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: laravel_nginx
+    volumes:
+      - .:/var/www
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.laravel.rule=Host(`yourdomain.com`)"
+      - "traefik.http.services.laravel.loadbalancer.server.port=80"
+    expose:
+      - 80
