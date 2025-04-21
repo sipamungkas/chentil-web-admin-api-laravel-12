@@ -62,13 +62,15 @@ jobs:
           cp .env.example .env
           while IFS='=' read -r key _; do
             if [[ ! "$key" =~ ^# && -n "$key" ]]; then
-              value="${!key}"
+              value="$(echo "${!key}" | xargs)" # Trim whitespace
               if [ -n "$value" ]; then
                 esc_value=$(printf '%s\n' "$value" | sed -e 's/[\\/&]/\\\\&/g')
                 sed -i "s|^$key=.*|$key=$esc_value|" .env
               fi
             fi
           done < .env.example
+          # Remove lines with only whitespace
+          sed -i '/^[[:space:]]*$/d' .env
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
