@@ -150,5 +150,28 @@ class WishlistController extends Controller
         ]);
     }
 
-
+    /**
+     * Get wishlist count for each content category for the current user.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function categoryCounts(Request $request)
+    {
+        $user = $request->user();
+        $categories = [
+            Content::CATEGORY_DESTINATION,
+            Content::CATEGORY_OUTBOUND,
+            Content::CATEGORY_CULTURE,
+            Content::CATEGORY_FOOD_AND_BEVERAGE,
+        ];
+        $counts = [];
+        foreach ($categories as $category) {
+            $counts[$category] = $user->wishlists()->where('category', $category)->count();
+        }
+        return response()->json([
+            'status' => 'success',
+            'data' => $counts
+        ]);
+    }
 }

@@ -51,6 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/food-and-beverages', [ContentController::class, 'foodAndBeverages']);
     Route::get('/top-favorites', [ContentController::class, 'topFavorites']);
     Route::get('/top-favorites-by-category', [ContentController::class, 'topFavoritesByCategory']);
+    Route::get('/nearby', [ContentController::class, 'nearby']);
 
     // Recommendations routes
     Route::get('/recommendations', [RecommendationController::class, 'index']);
@@ -65,9 +66,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/wishlists/destinations', [WishlistController::class, 'destinations']);
     Route::get('/wishlists/outbounds', [WishlistController::class, 'outbounds']);
     Route::get('/wishlists/cultures', [WishlistController::class, 'cultures']);
-    Route::get('/wishlists/food-and-beverages', [WishlistController::class, 'foodAndBeverages']);
+    Route::get('/wishlists/fnb', [WishlistController::class, 'foodAndBeverages']);
     Route::post('/wishlists/{content}', [WishlistController::class, 'toggle']);
     Route::get('/wishlists/{content}/check', [WishlistController::class, 'check']);
+    Route::get('/wishlists/category-counts', [WishlistController::class, 'categoryCounts']);
 
     // Trip routes
     Route::get('/trips', [TripController::class, 'index']);

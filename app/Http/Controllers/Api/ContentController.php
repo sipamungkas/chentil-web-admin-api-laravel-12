@@ -215,4 +215,44 @@ class ContentController extends Controller
             'data' => $contents
         ]);
     }
+
+    /**
+     * Return a paginated list of content ordered by distance from given coordinates.
+     *
+     * @param Request $request
+     * @return ContentCollection
+     */
+    public function nearby(Request $request)
+    {
+        $lat = $request->input('latitude');
+        $lng = $request->input('longitude');
+        $perPage = $request->input('per_page', 10);
+        $maxDistance = $request->input('max_distance', 2); // in KM
+
+        if (!$lat || !$lng) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'latitude and longitude are required.'
+            ], 422);
+        }
+
+        $query = Content::query()
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->select('*')
+            ->selectRaw('(
+                6371 * acos(
+                    cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?))
+                    + sin(radians(?)) * sin(radians(latitude))
+                )
+            ) AS distance', [$lat, $lng, $lat])
+            ->when($maxDistance, function ($q) use ($maxDistance) {
+                $q->having('distance', '<=', $maxDistance);
+            })
+            ->orderBy('distance');
+        // the distance is in KM
+
+        $contents = $query->paginate($perPage);
+        return new ContentCollection($contents);
+    }
 }
