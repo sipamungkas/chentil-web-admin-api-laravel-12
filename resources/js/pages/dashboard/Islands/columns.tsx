@@ -13,18 +13,18 @@ interface Island {
 }
 
 export const columns: Column<Island>[] = [
-    {
-        accessorKey: 'image',
-        header: 'Image',
-        cell: (row) => {
-            const image = row.image;
-            return image ? (
-                <img src={`/storage/${image}`} alt={row.name} className="aspect-video w-16 rounded-sm object-cover" />
-            ) : (
-                <div className="aspect-video w-16 rounded-sm bg-gray-200" />
-            );
-        },
-    },
+    // {
+    //     accessorKey: 'image',
+    //     header: 'Image',
+    //     cell: (row) => {
+    //         const image = row.image;
+    //         return image ? (
+    //             <img src={`/storage/${image}`} alt={row.name} className="aspect-video w-16 rounded-sm object-cover" />
+    //         ) : (
+    //             <div className="aspect-video w-16 rounded-sm bg-gray-200" />
+    //         );
+    //     },
+    // },
     {
         accessorKey: 'name',
         header: 'Name',
