@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\ContentController;
 use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\WishlistController;
 use App\Http\Controllers\TripController;
+use App\Http\Controllers\Api\EventController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +26,7 @@ use App\Http\Controllers\TripController;
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -81,4 +83,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/trips/{trip}/contents/{content}', [TripController::class, 'removeContent']);
 
     Route::get('/provinces', [ProvinceController::class, 'index']);
+
+    // events
+    Route::get('/events', [EventController::class, 'index']);
 });
