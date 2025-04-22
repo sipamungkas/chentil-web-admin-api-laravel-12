@@ -17,6 +17,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Run Laravel cache clear and cache optimize
+        run: |
+          php artisan optimize:clear
+          php artisan optimize:cache
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
