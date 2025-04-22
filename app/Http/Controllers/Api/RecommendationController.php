@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\S3Helper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ContentCollection;
 use App\Models\Content;
@@ -27,6 +28,10 @@ class RecommendationController extends Controller
             ->orderBy('title', 'asc')
             ->paginate($perPage);
 
+        $recommendations->getCollection()->transform(function ($item) {
+            $item->image = S3Helper::getS3ImageUrl($item->image ?? null);
+            return $item;
+        });
 
         return new ContentCollection($recommendations);
     }

@@ -274,6 +274,8 @@ class ContentController extends Controller
             'category' => $content->category,
         ]);
 
+        $content->image = S3Helper::getS3ImageUrl($content->image ?? null);
+
         return Inertia::render('dashboard/Content/Show', [
             'title' => ucfirst($content->category) . ' Details',
             'content' => $content->load(['district', 'province', 'regency']),

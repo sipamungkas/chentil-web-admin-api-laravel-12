@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use App\Helpers\S3Helper;
 use App\Http\Controllers\Controller;
 use App\Models\Content;
 use App\Models\Recommendation;
@@ -31,6 +32,11 @@ class RecommendationController extends Controller
                 'count' => $recommendations->count()
             ]);
 
+            $recommendations = $recommendations->transform(function ($item) {
+                $item->image = S3Helper::getS3ImageUrl($item->image ?? null);
+                return $item;
+            });
+
             return Inertia::render('dashboard/Recommendation/Index', [
                 'recommendations' => $recommendations
             ]);
@@ -39,7 +45,7 @@ class RecommendationController extends Controller
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return Inertia::render('dashboard/Recommendation/Index', [
                 'recommendations' => [],
                 'error' => 'Failed to load recommendations: ' . $e->getMessage()
