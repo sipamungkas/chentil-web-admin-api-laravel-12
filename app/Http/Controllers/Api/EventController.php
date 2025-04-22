@@ -16,7 +16,7 @@ class EventController extends Controller
      */
     public function index(): JsonResponse
     {
-        $events = Event::orderBy('start_date')->get(['start_date', 'title']);
+        $events = Event::orderBy('start_date')->get(['start_date', 'title', 'description', 'start_date', 'end_date']);
         $markedDates = [];
         foreach ($events as $event) {
             $date = $event->start_date->toDateString();
@@ -24,9 +24,13 @@ class EventController extends Controller
                 'selected' => false,
                 'marked' => true,
                 'selectedColor' => '#E16FAB',
-                'event' => $event->title
+                'event' => $event->title,
+                "description" => $event->description,
+                "start_date" => $event->start_date,
+                "end_date" => $event->end_date
             ];
         }
+
         return response()->json([
             'data' => $markedDates
         ]);
