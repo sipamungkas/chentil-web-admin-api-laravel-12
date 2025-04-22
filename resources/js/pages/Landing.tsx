@@ -148,7 +148,7 @@ export default function Landing() {
               </div>
             </div>
             <div className="md:w-1/2 flex justify-center">
-              <div className="relative">
+              {/* <div className="relative">
                 <div className="absolute -top-4 -right-4 w-24 h-24 rounded-full" style={{ backgroundColor: colors.brand.secondary, opacity: 0.3 }}></div>
                 <div className="absolute -bottom-4 -left-4 w-32 h-32 rounded-full" style={{ backgroundColor: colors.brand.accent, opacity: 0.3 }}></div>
                 <img 
@@ -157,7 +157,7 @@ export default function Landing() {
                   className="w-full max-w-md rounded-lg shadow-xl"
                   style={{ border: `4px solid ${colors.border.light}` }}
                 />
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -234,12 +234,12 @@ export default function Landing() {
               <div className="relative">
                 <div className="absolute -top-4 -right-4 w-24 h-24 rounded-full" style={{ backgroundColor: colors.brand.accent, opacity: 0.3 }}></div>
                 <div className="absolute -bottom-4 -left-4 w-32 h-32 rounded-full" style={{ backgroundColor: colors.brand.secondary, opacity: 0.3 }}></div>
-                <img 
+                {/* <img 
                   src="/images/app-mockup.png" 
                   alt="Chentil Android App" 
                   className="w-full max-w-md rounded-lg shadow-xl"
                   style={{ border: `4px solid ${colors.border.medium}` }}
-                />
+                /> */}
               </div>
             </div>
           </div>
