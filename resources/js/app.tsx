@@ -6,7 +6,8 @@ import { createRoot } from 'react-dom/client';
 import { Toaster } from 'sonner';
 import { initializeTheme } from './hooks/use-appearance';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+// const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = 'Chentil Dashboard';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
@@ -18,7 +19,7 @@ createInertiaApp({
             <>
                 <App {...props} />
                 <Toaster />
-            </>
+            </>,
         );
     },
     progress: {
