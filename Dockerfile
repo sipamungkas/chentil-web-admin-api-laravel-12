@@ -107,8 +107,8 @@ RUN npm install
 # Copy the rest of the application (including Vite entry points and resources)
 COPY . .
 
-# Build frontend assets
-RUN npm run build
+# Build frontend assets with VITE_APP_NAME set for Vite
+RUN VITE_APP_NAME="$VITE_APP_NAME" npm run build
 
 # Set permissions (optional, but recommended)
 RUN chown -R www-data:www-data /var/www
