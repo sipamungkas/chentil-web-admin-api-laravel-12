@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\api\IslandController;
+use App\Http\Controllers\Api\IslandController;
 use App\Http\Controllers\Api\ProvinceController;
 use App\Http\Controllers\Api\RecommendationController;
 use Illuminate\Support\Facades\Route;
