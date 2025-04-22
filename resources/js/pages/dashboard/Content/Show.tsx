@@ -101,7 +101,7 @@ export default function Show({ title, category, content }: Props) {
                             <div>
                                 <h3 className="mb-2 font-medium">Image</h3>
                                 <div className="relative aspect-video h-92 overflow-hidden rounded-lg border border-gray-200">
-                                    <img src={`/storage/${content.image}`} alt={content.title} className="h-full w-full object-cover" />
+                                    <img src={content.image} alt={content.title} className="h-full w-full object-cover" />
                                 </div>
                             </div>
                         )}
@@ -118,9 +118,8 @@ export default function Show({ title, category, content }: Props) {
                                 </div>
                             )}
                             <div>
-                                <span className="font-medium">District:</span> <span className="text-gray-600">
-                                    {content.district ? content.district.name : 'Not specified'}
-                                </span>
+                                <span className="font-medium">District:</span>{' '}
+                                <span className="text-gray-600">{content.district ? content.district.name : 'Not specified'}</span>
                             </div>
                             <div>
                                 <span className="font-medium">Order:</span> <span className="text-gray-600">{content.order}</span>

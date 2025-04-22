@@ -163,11 +163,7 @@ export default function Index({ recommendations }: Props) {
                                         className="overflow-hidden rounded-lg border bg-white shadow-sm transition-all hover:shadow-md"
                                     >
                                         <div className="relative h-48 w-full">
-                                            <img
-                                                src={`/storage/${item.image}`}
-                                                alt={item.title}
-                                                className="aspect-video h-48 w-full rounded-lg object-cover"
-                                            />
+                                            <img src={item.image} alt={item.title} className="aspect-video h-48 w-full rounded-lg object-cover" />
                                             <div className="absolute right-0 bottom-0 left-0 bg-gradient-to-t from-black/70 to-transparent p-3">
                                                 <span className="rounded-full bg-white/20 px-3 py-1 text-xs text-white capitalize backdrop-blur-sm">
                                                     {item.category}
