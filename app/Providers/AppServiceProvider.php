@@ -24,14 +24,6 @@ class AppServiceProvider extends ServiceProvider
     {
         if (env('APP_ENV') === 'production') {
             URL::forceScheme('https');
-
-            Request::setTrustedProxies(
-                ['0.0.0.0/0'], // trust all, or use Cloudflare IP ranges
-                Request::HEADER_X_FORWARDED_FOR |
-                Request::HEADER_X_FORWARDED_HOST |
-                Request::HEADER_X_FORWARDED_PORT |
-                Request::HEADER_X_FORWARDED_PROTO
-            );
         }
     }
 }
