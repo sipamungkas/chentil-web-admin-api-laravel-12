@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Http\Request;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
 
             Request::setTrustedProxies(
-                [request()->getClientIp()],
+                ['0.0.0.0/0'], // trust all, or use Cloudflare IP ranges
                 Request::HEADER_X_FORWARDED_ALL
             );
         }
