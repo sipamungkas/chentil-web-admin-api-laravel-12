@@ -88,4 +88,13 @@ class RegencyController extends Controller
             ->route('dashboard.regencies.index')
             ->with('success', 'Regency deleted successfully.');
     }
+
+    public function province($regencyId)
+    {
+        $regency = Regency::with('province')->find($regencyId);
+        if (!$regency || !$regency->province) {
+            return response()->json(['message' => 'Province not found for this regency'], 404);
+        }
+        return response()->json($regency->province);
+    }
 }

@@ -96,6 +96,7 @@ Route::middleware(['auth', 'verified', AdminOnly::class])->group(function () {
         // Location Management
         Route::resource('districts', \App\Http\Controllers\Dashboard\DistrictController::class);
         Route::get('/districts/{district}/regency', [App\Http\Controllers\Dashboard\DistrictController::class, 'regency']);
+        Route::get('/regencies/{regency}/province', [App\Http\Controllers\Dashboard\RegencyController::class, 'province']);
         Route::resource('regencies', \App\Http\Controllers\Dashboard\RegencyController::class);
         Route::resource('villages', \App\Http\Controllers\Dashboard\VillageController::class);
     });
