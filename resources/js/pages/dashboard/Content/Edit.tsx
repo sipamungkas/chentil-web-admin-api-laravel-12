@@ -111,6 +111,7 @@ export default function Edit({ title, category, districts, content }: Props) {
             if (formData.province_id) {
                 try {
                     const response = await axios.get<Regency[]>(`/dashboard/provinces/${formData.province_id}/regencies`, {});
+
                     setRegencies(response.data);
                     // Clear regency and district selection when province changes
                     setFormData((prev) => ({ ...prev, regency_id: '', district_id: '' }));
@@ -153,19 +154,19 @@ export default function Edit({ title, category, districts, content }: Props) {
                     // Find the regency for this district
                     const regencyResponse = await axios.get<Regency>(`/dashboard/districts/${content.district.id}/regency`, {});
                     const regency = regencyResponse.data;
-                    
+
                     // Find the province for this regency
                     const provinceResponse = await axios.get<Province>(`/dashboard/regencies/${regency.id}/province`, {});
                     const province = provinceResponse.data;
-                    
+
                     // Set the initial values
-                    setFormData(prev => ({
+                    setFormData((prev) => ({
                         ...prev,
                         province_id: String(province.id),
                         regency_id: String(regency.id),
-                        district_id: String(content.district_id)
+                        district_id: String(content.district_id),
                     }));
-                    
+
                     // Set the available districts
                     setAvailableDistricts(districts);
                 } catch (error) {
@@ -173,7 +174,7 @@ export default function Edit({ title, category, districts, content }: Props) {
                 }
             }
         };
-        
+
         findInitialLocation();
     }, [content.district, content.district_id, districts]);
 
@@ -321,11 +322,7 @@ export default function Edit({ title, category, districts, content }: Props) {
                                             <img src={`/storage/${content.image}`} alt={content.title} className="h-full w-auto object-cover" />
                                         </div>
                                         <div className="mt-2">
-                                            <Button 
-                                                type="button" 
-                                                variant="outline" 
-                                                onClick={() => document.getElementById('image')?.click()}
-                                            >
+                                            <Button type="button" variant="outline" onClick={() => document.getElementById('image')?.click()}>
                                                 Change Image
                                             </Button>
                                         </div>
@@ -347,9 +344,9 @@ export default function Edit({ title, category, districts, content }: Props) {
                                             <img src={imagePreview} alt="Image preview" className="h-full w-full object-cover" />
                                         </div>
                                         <div className="mt-2">
-                                            <Button 
-                                                type="button" 
-                                                variant="outline" 
+                                            <Button
+                                                type="button"
+                                                variant="outline"
                                                 onClick={() => {
                                                     setFormData({ ...formData, image: null });
                                                     setImagePreview(null);
