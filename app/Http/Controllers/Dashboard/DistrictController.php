@@ -93,4 +93,16 @@ class DistrictController extends Controller
             ->route('dashboard.districts.index')
             ->with('success', 'District deleted successfully.');
     }
+
+    /**
+     * Return the regency (with province) for a given district.
+     */
+    public function regency($districtId)
+    {
+        $district = District::with('regency.province')->find($districtId);
+        if (!$district || !$district->regency) {
+            return response()->json(['message' => 'Regency not found for this district'], 404);
+        }
+        return response()->json($district->regency);
+    }
 }
